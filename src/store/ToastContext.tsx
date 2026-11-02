@@ -39,15 +39,15 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           <div
             key={t.id}
             role="status"
-            className="pointer-events-auto flex w-full max-w-sm animate-slide-up items-center gap-3 rounded-xl bg-slate-900 px-4 py-3 text-sm text-white shadow-lg ring-1 ring-white/10 dark:bg-slate-800"
+            className="pointer-events-auto flex w-full max-w-sm animate-slide-up items-center gap-3 rounded-2xl bg-slate-900 py-3 pl-4 pr-2 text-[13px] font-medium text-white shadow-pop dark:bg-slate-800"
           >
             {t.tipo === 'sucesso' && <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-400" />}
             {t.tipo === 'erro' && <XCircle className="h-5 w-5 shrink-0 text-red-400" />}
-            {t.tipo === 'info' && <Info className="h-5 w-5 shrink-0 text-sky-400" />}
+            {t.tipo === 'info' && <Info className="h-5 w-5 shrink-0 text-slate-400" />}
             <span className="flex-1">{t.mensagem}</span>
             {t.acao && (
               <button
-                className="rounded-md px-2 py-1 font-semibold text-brand-300 hover:bg-white/10"
+                className="rounded-full px-3 py-1 font-semibold text-brand-300 hover:bg-white/10"
                 onClick={() => {
                   t.acao!.onClick();
                   fechar(t.id);

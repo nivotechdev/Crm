@@ -31,7 +31,7 @@ export function BarrasEmpilhadas({
               {total > 0 && (
                 <span className="mb-0.5 hidden text-center text-[10px] font-semibold tabular-nums text-slate-500 group-hover:block">{total}</span>
               )}
-              <div className="flex flex-col-reverse overflow-hidden rounded-t-[3px]" style={{ height: `${(total / max) * 100}%` }}>
+              <div className="flex flex-col-reverse overflow-hidden rounded-t-md" style={{ height: `${(total / max) * 100}%` }}>
                 {d.valores.map((v, j) => (
                   <div key={j} className={cn(cores[j], 'transition-all')} style={{ height: total ? `${(v / total) * 100}%` : 0 }} />
                 ))}
@@ -70,7 +70,7 @@ export function BarrasHorizontais({ itens, cor = 'bg-brand-500' }: { itens: Arra
             <span className="truncate font-medium text-slate-700 dark:text-slate-300">{i.label}</span>
             <span className="shrink-0 tabular-nums text-slate-500">{i.texto ?? i.valor}</span>
           </div>
-          <div className="h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+          <div className="h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
             <div className={cn('h-full rounded-full', i.cor ?? cor)} style={{ width: `${(i.valor / max) * 100}%` }} />
           </div>
         </li>

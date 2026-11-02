@@ -15,9 +15,9 @@ const html = readFileSync(join(dir, 'index.html'), 'utf8');
 const temaInicial = html.match(/<script>([\s\S]*?)<\/script>/)[1];
 
 const pagina = `<title>CRM Consórcio</title>
-<meta name="theme-color" content="#2149eb">
+<meta name="theme-color" content="#FF5F15">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
 <script>${temaInicial}</script>
 <style>${css}</style>
 <div id="root"></div>

@@ -80,11 +80,11 @@ export function Simulator({ lead }: { lead: Lead }) {
         </Field>
       </div>
 
-      <div className="mt-4 rounded-xl bg-slate-50 p-4 ring-1 ring-slate-200 dark:bg-slate-800/60 dark:ring-slate-700">
+      <div className="mt-4 rounded-3xl bg-slate-50 p-5 dark:bg-slate-800/60">
         {calc ? (
           <>
             <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Parcela estimada</p>
-            <p className="text-3xl font-bold tabular-nums text-slate-900 dark:text-white">{formatBRL(calc.parcela, true)}</p>
+            <p className="num mt-0.5 text-[34px] font-bold tracking-tight text-slate-900 dark:text-white">{formatBRL(calc.parcela, true)}</p>
             <dl className="mt-2 grid grid-cols-3 gap-2 text-xs">
               <div>
                 <dt className="text-slate-500">Fundo comum</dt>
@@ -106,8 +106,8 @@ export function Simulator({ lead }: { lead: Lead }) {
             <Calculator className="h-4 w-4" /> Preencha os 4 campos para calcular.
           </p>
         )}
-        <p className="mt-3 flex items-start gap-1.5 rounded-lg bg-amber-50 px-2.5 py-2 text-xs font-medium text-amber-800 dark:bg-amber-500/10 dark:text-amber-300">
-          <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+        <p className="mt-4 flex items-start gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">
+          <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-600" />
           Estimativa — confirme no sistema da administradora. Não inclui seguro, reajustes, lance ou regras específicas do grupo.
         </p>
       </div>

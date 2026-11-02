@@ -12,7 +12,7 @@ export function Segmented<T extends string>({
   className?: string;
 }) {
   return (
-    <div role="tablist" className={cn('inline-flex rounded-xl bg-slate-100 p-1 dark:bg-slate-800', className)}>
+    <div role="tablist" className={cn('inline-flex rounded-full bg-slate-100 p-1 dark:bg-slate-800/80', className)}>
       {opcoes.map((o) => (
         <button
           key={o.value}
@@ -20,9 +20,9 @@ export function Segmented<T extends string>({
           aria-selected={valor === o.value}
           onClick={() => onChange(o.value)}
           className={cn(
-            'flex-1 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium transition-colors',
+            'flex-1 whitespace-nowrap rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-colors',
             valor === o.value
-              ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white'
+              ? 'bg-white text-slate-900 shadow-card dark:bg-slate-700 dark:text-white'
               : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200',
           )}
         >

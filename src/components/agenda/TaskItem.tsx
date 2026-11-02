@@ -25,22 +25,22 @@ export function TaskItem({ tarefa, lead, onExcluir, mostrarData = true }: { tare
   };
 
   return (
-    <li className={cn('group relative flex items-center gap-3 py-2.5 pl-4 pr-2 sm:pr-3', tarefa.concluida && 'opacity-60')}>
-      {lead && <ContactStripe ultimoContatoEm={lead.ultimoContatoEm} className="w-1" />}
+    <li className={cn('group relative flex items-center gap-3 py-3 pl-5 pr-3 sm:pr-4', tarefa.concluida && 'opacity-50')}>
+      {lead && <ContactStripe ultimoContatoEm={lead.ultimoContatoEm} className="inset-y-3 w-[3px] rounded-r-full" />}
       <button
         onClick={alternar}
         aria-label={tarefa.concluida ? 'Marcar como pendente' : 'Concluir'}
         className={cn(
-          'flex h-7 w-7 shrink-0 items-center justify-center rounded-full ring-2 transition-colors',
+          'flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition-colors',
           tarefa.concluida
-            ? 'bg-emerald-500 text-white ring-emerald-500'
-            : 'text-transparent ring-slate-300 hover:bg-emerald-50 hover:text-emerald-600 hover:ring-emerald-500 dark:ring-slate-600 dark:hover:bg-emerald-500/10',
+            ? 'border-emerald-500 bg-emerald-500 text-white'
+            : 'border-slate-300 text-transparent hover:border-emerald-500 hover:text-emerald-600 dark:border-slate-600',
         )}
       >
-        <Check className="h-4 w-4" />
+        <Check className="h-3.5 w-3.5" strokeWidth={3} />
       </button>
       <div className="min-w-0 flex-1">
-        <p className={cn('truncate text-sm font-medium text-slate-900 dark:text-white', tarefa.concluida && 'line-through')}>
+        <p className={cn('truncate text-sm font-semibold text-slate-900 dark:text-white', tarefa.concluida && 'line-through')}>
           {lead ? (
             <Link to={`/leads/${lead.id}`} className="hover:text-brand-700 dark:hover:text-brand-300">
               {lead.nome}
@@ -51,7 +51,7 @@ export function TaskItem({ tarefa, lead, onExcluir, mostrarData = true }: { tare
         </p>
         <p className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-500 dark:text-slate-400">
           {lead && <span className="truncate">{tarefa.titulo}</span>}
-          <span className="rounded bg-slate-100 px-1 text-[10px] font-semibold uppercase text-slate-500 dark:bg-slate-800">{TIPOS_TAREFA[tarefa.tipo]}</span>
+          <span className="text-slate-400">· {TIPOS_TAREFA[tarefa.tipo]}</span>
           <span className={cn(atrasada && 'font-semibold text-red-600 dark:text-red-400')}>
             {mostrarData && `${tempoRelativoAgenda(tarefa.dataHora, now)}`}
             {mostrarData && dias !== 0 && ` (${formatData(tarefa.dataHora, { ano: false })})`}

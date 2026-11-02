@@ -26,38 +26,38 @@ export const NIVEL_ESTILO: Record<
 > = {
   verde: {
     faixa: 'bg-emerald-500',
-    badge: 'bg-emerald-50 text-emerald-800 ring-emerald-600/25 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-emerald-400/30',
+    badge: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300',
     ponto: 'bg-emerald-500',
     label: 'Contatado hoje',
     hex: '#10b981',
   },
   amarelo: {
     faixa: 'bg-yellow-400',
-    badge: 'bg-yellow-50 text-yellow-800 ring-yellow-600/30 dark:bg-yellow-400/15 dark:text-yellow-200 dark:ring-yellow-300/30',
+    badge: 'bg-yellow-50 text-yellow-800 dark:bg-yellow-400/10 dark:text-yellow-200',
     ponto: 'bg-yellow-400',
     label: 'Recente',
     hex: '#facc15',
   },
   laranja: {
-    faixa: 'bg-orange-500',
-    badge: 'bg-orange-50 text-orange-800 ring-orange-600/30 dark:bg-orange-500/15 dark:text-orange-300 dark:ring-orange-400/30',
-    ponto: 'bg-orange-500',
+    faixa: 'bg-orange-400',
+    badge: 'bg-orange-50 text-orange-700 dark:bg-orange-400/10 dark:text-orange-300',
+    ponto: 'bg-orange-400',
     label: 'Esfriando',
-    hex: '#f97316',
+    hex: '#fb923c',
   },
   vermelho: {
     faixa: 'bg-red-500',
-    badge: 'bg-red-50 text-red-800 ring-red-600/25 dark:bg-red-500/15 dark:text-red-300 dark:ring-red-400/30',
+    badge: 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300',
     ponto: 'bg-red-500',
     label: 'Atrasado',
     hex: '#ef4444',
   },
   cinza: {
     faixa: 'bg-slate-300 dark:bg-slate-600',
-    badge: 'bg-slate-100 text-slate-700 ring-slate-500/20 dark:bg-slate-500/15 dark:text-slate-300 dark:ring-slate-400/25',
+    badge: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300',
     ponto: 'bg-slate-400',
     label: 'Nunca contatado',
-    hex: '#94a3b8',
+    hex: '#A9A49F',
   },
 };
 

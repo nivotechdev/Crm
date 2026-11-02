@@ -5,11 +5,11 @@ import {
 import { cn } from '../../lib/cn';
 
 export const inputBase =
-  'block w-full rounded-lg border-0 bg-white px-3 py-2 text-sm text-slate-900 ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-brand-500 dark:bg-slate-800 dark:text-slate-100 dark:ring-slate-600 dark:placeholder:text-slate-500';
+  'block w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-900 outline-none transition-colors placeholder:text-slate-400 hover:border-slate-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500';
 
 export function Label({ children, htmlFor, obrigatorio }: { children: ReactNode; htmlFor?: string; obrigatorio?: boolean }) {
   return (
-    <label htmlFor={htmlFor} className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-400">
+    <label htmlFor={htmlFor} className="mb-1.5 block text-xs font-medium text-slate-500 dark:text-slate-400">
       {children}
       {obrigatorio && <span className="ml-0.5 text-red-500">*</span>}
     </label>
@@ -17,7 +17,7 @@ export function Label({ children, htmlFor, obrigatorio }: { children: ReactNode;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(function Input({ className, ...p }, ref) {
-  return <input ref={ref} className={cn(inputBase, 'h-10', className)} {...p} />;
+  return <input ref={ref} className={cn(inputBase, 'h-11', className)} {...p} />;
 });
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement>>(function Textarea(
@@ -34,7 +34,7 @@ export function Select({
   ...p
 }: SelectHTMLAttributes<HTMLSelectElement> & { opcoes: Array<{ value: string; label: string }>; vazio?: string }) {
   return (
-    <select className={cn(inputBase, 'h-10 pr-8', className)} {...p}>
+    <select className={cn(inputBase, 'h-11 pr-9', className)} {...p}>
       {vazio !== undefined && <option value="">{vazio}</option>}
       {opcoes.map((o) => (
         <option key={o.value} value={o.value}>

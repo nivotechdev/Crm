@@ -3,25 +3,25 @@
 @tailwind utilities;
 
 :root {
-  --app-bg: #f8fafc;
-  --app-fg: #0f172a;
+  --app-bg: #FAFAF9;
+  --app-fg: #1C1916;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --app-bg: #020617;
-    --app-fg: #f1f5f9;
+    --app-bg: #110F0D;
+    --app-fg: #F4F3F1;
     color-scheme: dark;
   }
 }
 :root[data-theme='dark'],
 html.dark:root {
-  --app-bg: #020617;
-  --app-fg: #f1f5f9;
+  --app-bg: #110F0D;
+  --app-fg: #F4F3F1;
   color-scheme: dark;
 }
 html.light:root {
-  --app-bg: #f8fafc;
-  --app-fg: #0f172a;
+  --app-bg: #FAFAF9;
+  --app-fg: #1C1916;
   color-scheme: light;
 }
 
@@ -44,7 +44,7 @@ html.light:root {
   select {
     -webkit-appearance: none;
     appearance: none;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23A9A49F' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
     background-position: right 0.5rem center;
     background-repeat: no-repeat;
     background-size: 1.25em 1.25em;
@@ -55,6 +55,9 @@ html.light:root {
 }
 
 @layer components {
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
   .select-chevron {
     background-position: right 0.2rem center;
     background-size: 1.1em 1.1em;
@@ -67,5 +70,14 @@ html.light:root {
   }
   .no-scrollbar::-webkit-scrollbar {
     display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 }

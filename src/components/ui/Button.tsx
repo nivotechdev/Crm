@@ -5,19 +5,19 @@ type Variante = 'primario' | 'secundario' | 'fantasma' | 'perigo' | 'sucesso' | 
 type Tamanho = 'sm' | 'md' | 'lg';
 
 const VARIANTES: Record<Variante, string> = {
-  primario: 'bg-brand-600 text-white hover:bg-brand-700 shadow-sm',
+  primario: 'bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800',
   secundario:
-    'bg-white text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-600 dark:hover:bg-slate-700',
-  fantasma: 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800',
-  perigo: 'bg-red-600 text-white hover:bg-red-700 shadow-sm',
-  sucesso: 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm',
-  whatsapp: 'bg-[#1fa855] text-white hover:bg-[#178a45] shadow-sm',
+    'bg-white text-slate-800 border border-slate-200 hover:border-slate-300 hover:bg-slate-50 dark:bg-slate-900 dark:text-slate-100 dark:border-slate-700 dark:hover:bg-slate-800',
+  fantasma: 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white',
+  perigo: 'bg-red-600 text-white hover:bg-red-700',
+  sucesso: 'bg-emerald-600 text-white hover:bg-emerald-700',
+  whatsapp: 'bg-[#1DA851] text-white hover:bg-[#178a45]',
 };
 
 const TAMANHOS: Record<Tamanho, string> = {
-  sm: 'h-8 px-2.5 text-xs gap-1.5 rounded-lg',
-  md: 'h-10 px-3.5 text-sm gap-2 rounded-lg',
-  lg: 'h-12 px-5 text-base gap-2 rounded-xl',
+  sm: 'h-8 px-3 text-xs gap-1.5 rounded-full',
+  md: 'h-10 px-4 text-sm gap-2 rounded-full',
+  lg: 'h-12 px-6 text-[15px] gap-2 rounded-full',
 };
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -36,7 +36,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       ref={ref}
       type={type}
       className={cn(
-        'inline-flex select-none items-center justify-center whitespace-nowrap font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:pointer-events-none disabled:opacity-50',
+        'inline-flex select-none items-center justify-center whitespace-nowrap font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:pointer-events-none disabled:opacity-50',
         VARIANTES[variante],
         TAMANHOS[tamanho],
         bloco && 'w-full',
@@ -62,7 +62,7 @@ export function IconButton({
       aria-label={label}
       title={label}
       className={cn(
-        'inline-flex h-10 w-10 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-500 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100',
+        'inline-flex h-10 w-10 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-500 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100',
         className,
       )}
       {...rest}

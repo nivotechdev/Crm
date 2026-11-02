@@ -7,35 +7,35 @@ import { diffDiasCalendario, formatHora, tempoRelativoAgenda } from '../../lib/d
 import { TEMPERATURAS } from '../../lib/labels';
 import { cn } from '../../lib/cn';
 
+/** Etapa: ponto colorido + nome em texto neutro (sem fundo colorido). */
 export function EtapaBadge({ etapaId, className }: { etapaId: string; className?: string }) {
   const { config } = useData();
   const e = etapaPorId(config, etapaId);
-  const c = corEtapa(e);
   return (
-    <span className={cn('inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-2 py-0.5 text-xs font-medium', c.chip, className)}>
-      <span className={cn('h-1.5 w-1.5 rounded-full', c.dot)} />
+    <span className={cn('inline-flex items-center gap-1.5 whitespace-nowrap text-xs font-medium text-slate-600 dark:text-slate-300', className)}>
+      <span className={cn('h-2 w-2 rounded-full', corEtapa(e).dot)} />
       {e?.nome ?? 'Sem etapa'}
     </span>
   );
 }
 
 const TEMP: Record<Temperatura, { cls: string; Icone: typeof Flame }> = {
-  quente: { cls: 'text-red-600 bg-red-50 dark:bg-red-500/15 dark:text-red-300', Icone: Flame },
-  morno: { cls: 'text-amber-700 bg-amber-50 dark:bg-amber-500/15 dark:text-amber-300', Icone: Sun },
-  frio: { cls: 'text-sky-700 bg-sky-50 dark:bg-sky-500/15 dark:text-sky-300', Icone: Snowflake },
+  quente: { cls: 'text-red-500', Icone: Flame },
+  morno: { cls: 'text-amber-500', Icone: Sun },
+  frio: { cls: 'text-sky-500', Icone: Snowflake },
 };
 
 export function TemperaturaBadge({ temperatura, soIcone }: { temperatura: Temperatura; soIcone?: boolean }) {
   const { cls, Icone } = TEMP[temperatura];
   return (
-    <span title={`Temperatura: ${TEMPERATURAS[temperatura]}`} className={cn('inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-xs font-medium', cls)}>
+    <span title={`Temperatura: ${TEMPERATURAS[temperatura]}`} aria-label={`Temperatura: ${TEMPERATURAS[temperatura]}`} className={cn('inline-flex items-center gap-1 text-xs font-medium', cls)}>
       <Icone className="h-3.5 w-3.5" />
-      {!soIcone && TEMPERATURAS[temperatura]}
+      {!soIcone && <span className="text-slate-600 dark:text-slate-300">{TEMPERATURAS[temperatura]}</span>}
     </span>
   );
 }
 
-/** "Retorno hoje 14:00" / "Atrasado 2 dias" */
+/** "Hoje 14:00" / "Atrasado 2 dias" */
 export function ProximoPassoBadge({ tarefa, className }: { tarefa?: Tarefa; className?: string }) {
   const now = useNow();
   if (!tarefa) return null;
@@ -46,8 +46,8 @@ export function ProximoPassoBadge({ tarefa, className }: { tarefa?: Tarefa; clas
     <span
       title={tarefa.titulo}
       className={cn(
-        'inline-flex items-center gap-1 whitespace-nowrap text-xs font-medium',
-        atrasada ? 'text-red-600 dark:text-red-400' : hoje ? 'text-brand-600 dark:text-brand-400' : 'text-slate-500 dark:text-slate-400',
+        'inline-flex items-center gap-1 whitespace-nowrap text-[11px] font-medium',
+        atrasada ? 'text-red-600 dark:text-red-400' : hoje ? 'text-brand-700 dark:text-brand-400' : 'text-slate-500 dark:text-slate-400',
         className,
       )}
     >

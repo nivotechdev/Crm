@@ -87,9 +87,9 @@ export function CommandPalette() {
   if (!buscaAberta) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center sm:p-4 sm:pt-[10vh]" role="dialog" aria-modal="true" aria-label="Busca global">
-      <div className="absolute inset-0 animate-fade-in bg-slate-900/50 backdrop-blur-[2px]" onClick={fechar} />
-      <div className="relative flex h-dvh w-full animate-slide-up flex-col overflow-hidden bg-white shadow-2xl dark:bg-slate-900 sm:h-auto sm:max-h-[70vh] sm:max-w-2xl sm:rounded-2xl">
-        <div className="flex items-center gap-3 border-b border-slate-200 px-4 pt-[env(safe-area-inset-top)] dark:border-slate-800">
+      <div className="absolute inset-0 animate-fade-in bg-slate-950/40 backdrop-blur-sm" onClick={fechar} />
+      <div className="relative flex h-dvh w-full animate-slide-up flex-col overflow-hidden bg-white shadow-pop dark:bg-slate-900 sm:h-auto sm:max-h-[70vh] sm:max-w-2xl sm:rounded-[28px]">
+        <div className="flex items-center gap-3 border-b border-slate-100 px-5 pt-[env(safe-area-inset-top)] dark:border-slate-800">
           <Search className="h-5 w-5 shrink-0 text-slate-400" />
           <input
             ref={inputRef}
@@ -112,7 +112,7 @@ export function CommandPalette() {
         <div ref={listaRef} className="flex-1 overflow-y-auto p-2" role="listbox">
           {itens.map((it, i) => {
             const ativo = i === sel;
-            const base = cn('flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-left', ativo ? 'bg-brand-50 dark:bg-brand-500/15' : 'hover:bg-slate-50 dark:hover:bg-slate-800/60');
+            const base = cn('flex w-full cursor-pointer items-center gap-3 rounded-2xl px-3 py-2.5 text-left', ativo ? 'bg-slate-100 dark:bg-slate-800' : 'hover:bg-slate-50 dark:hover:bg-slate-800/60');
             if (it.tipo === 'lead')
               return (
                 <div key={it.lead.id} data-idx={i} role="option" aria-selected={ativo} className={base} onMouseMove={() => setSel(i)} onClick={() => executar(it)}>
@@ -134,7 +134,7 @@ export function CommandPalette() {
             if (it.tipo === 'cliente')
               return (
                 <div key={it.cliente.id} data-idx={i} role="option" aria-selected={ativo} className={base} onMouseMove={() => setSel(i)} onClick={() => executar(it)}>
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800">
                     <UserCheck className="h-4 w-4" />
                   </span>
                   <div className="min-w-0 flex-1">

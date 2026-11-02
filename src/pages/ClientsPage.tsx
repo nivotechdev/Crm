@@ -26,9 +26,9 @@ import { PageHeader } from '../components/layout/PageHeader';
 type Filtro = 'todos' | StatusCliente | 'indicacao' | 'assembleia';
 
 const STATUS_COR: Record<StatusCliente, string> = {
-  ativo: 'bg-sky-50 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300',
-  contemplado: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300',
-  cancelado: 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400',
+  ativo: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300',
+  contemplado: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300',
+  cancelado: 'bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-300',
 };
 
 export default function ClientsPage() {
@@ -89,7 +89,7 @@ export default function ClientsPage() {
   const alertasIndicacao = clientes.filter((c) => precisaPedirIndicacao(c, now));
 
   return (
-    <div className="mx-auto max-w-6xl px-3 py-4 md:px-6 md:py-6">
+    <div className="mx-auto max-w-6xl px-4 py-5 md:px-8 md:py-8">
       <PageHeader
         titulo="Clientes"
         subtitulo={`${clientes.length} cotas vendidas · ${formatBRLCompacto(volumeTotal)} em carteira ativa`}
@@ -104,9 +104,9 @@ export default function ClientsPage() {
       {(alertasAssembleia.length > 0 || alertasIndicacao.length > 0) && (
         <div className="mb-4 grid gap-3 md:grid-cols-2">
           {alertasAssembleia.length > 0 && (
-            <Card className="ring-amber-200 dark:ring-amber-500/30">
-              <CardHeader icone={<Gavel className="h-4 w-4 text-amber-500" />} titulo="Assembleias nos próximos 7 dias" />
-              <ul className="divide-y divide-slate-100 px-4 pb-2 dark:divide-slate-800 sm:px-5">
+            <Card>
+              <CardHeader icone={<Gavel className="h-4 w-4" />} titulo="Assembleias nos próximos 7 dias" />
+              <ul className="divide-y divide-slate-100 px-5 pb-3 dark:divide-slate-800">
                 {alertasAssembleia.map((c) => (
                   <li key={c.id} className="flex items-center gap-2 py-2">
                     <button className="min-w-0 flex-1 text-left" onClick={() => setParam('id', c.id)}>
@@ -116,7 +116,7 @@ export default function ClientsPage() {
                         {c.valorLance ? ` (${formatBRLCompacto(c.valorLance)})` : ''}
                       </p>
                     </button>
-                    <span className="shrink-0 rounded-md bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-800 dark:bg-amber-500/15 dark:text-amber-300">
+                    <span className="shrink-0 rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-semibold text-brand-700 dark:bg-brand-500/10 dark:text-brand-300">
                       {tempoRelativoAgenda(c.proximaAssembleia!, now)}
                     </span>
                     {modeloAssembleia && (
@@ -130,9 +130,9 @@ export default function ClientsPage() {
             </Card>
           )}
           {alertasIndicacao.length > 0 && (
-            <Card className="ring-violet-200 dark:ring-violet-500/30">
-              <CardHeader icone={<Gift className="h-4 w-4 text-violet-500" />} titulo="Peça indicações" subtitulo="Clientes satisfeitos são sua melhor fonte de leads" />
-              <ul className="divide-y divide-slate-100 px-4 pb-2 dark:divide-slate-800 sm:px-5">
+            <Card>
+              <CardHeader icone={<Gift className="h-4 w-4" />} titulo="Peça indicações" subtitulo="Clientes satisfeitos são sua melhor fonte de leads" />
+              <ul className="divide-y divide-slate-100 px-5 pb-3 dark:divide-slate-800">
                 {alertasIndicacao.slice(0, 5).map((c) => (
                   <li key={c.id} className="flex items-center gap-2 py-2">
                     <button className="min-w-0 flex-1 text-left" onClick={() => setParam('id', c.id)}>
@@ -154,7 +154,7 @@ export default function ClientsPage() {
                 ))}
                 {alertasIndicacao.length > 5 && (
                   <li className="py-2 text-center">
-                    <button className="text-xs font-medium text-violet-600 hover:underline dark:text-violet-300" onClick={() => setParam('filtro', 'indicacao')}>
+                    <button className="text-xs font-semibold text-brand-700 hover:underline dark:text-brand-300" onClick={() => setParam('filtro', 'indicacao')}>
                       Ver todos ({alertasIndicacao.length})
                     </button>
                   </li>
@@ -167,10 +167,10 @@ export default function ClientsPage() {
 
       <div className="mb-3 flex flex-col gap-2 md:flex-row md:items-center">
         <div className="relative md:w-72">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-          <input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Nome, administradora, grupo…" className={cn(inputBase, 'h-10 pl-9')} aria-label="Buscar clientes" />
+          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Nome, administradora, grupo…" className={cn(inputBase, 'h-10 rounded-full pl-10')} aria-label="Buscar clientes" />
         </div>
-        <div className="no-scrollbar -mx-3 flex gap-2 overflow-x-auto px-3 md:mx-0 md:px-0">
+        <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 md:mx-0 md:px-0">
           {(
             [
               ['todos', 'Todos'],
@@ -204,7 +204,7 @@ export default function ClientsPage() {
               <button
                 key={c.id}
                 onClick={() => setParam('id', c.id)}
-                className="rounded-2xl bg-white p-4 text-left ring-1 ring-slate-200 transition-shadow hover:shadow-md dark:bg-slate-900 dark:ring-slate-800"
+                className="rounded-3xl border border-slate-200/80 bg-white p-5 text-left transition-all hover:border-slate-300 hover:shadow-lift dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700"
               >
                 <div className="flex items-start gap-3">
                   <Avatar nome={c.nome} />
@@ -214,25 +214,25 @@ export default function ClientsPage() {
                       {c.administradora ?? 'Administradora —'} · Gr {c.grupo ?? '—'} / Cota {c.cota ?? '—'}
                     </p>
                   </div>
-                  <span className={cn('rounded-md px-2 py-0.5 text-xs font-medium', STATUS_COR[c.status])}>{STATUS_CLIENTE[c.status]}</span>
+                  <span className={cn('rounded-full px-2.5 py-0.5 text-[11px] font-semibold', STATUS_COR[c.status])}>{STATUS_CLIENTE[c.status]}</span>
                 </div>
                 <div className="mt-3 flex items-end justify-between gap-2">
                   <div>
-                    <p className="text-lg font-bold tabular-nums">{formatBRL(c.valorCarta)}</p>
+                    <p className="num text-xl font-bold tracking-tight">{formatBRL(c.valorCarta)}</p>
                     <p className="text-xs text-slate-500">
                       {c.tipoBem ? TIPOS_BEM[c.tipoBem] : '—'} · {c.prazoMeses ? `${c.prazoMeses} meses` : 'prazo —'} · vendido {formatData(c.dataVenda)}
                     </p>
                   </div>
                 </div>
                 {c.status === 'ativo' && (
-                  <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-slate-100 pt-2 text-xs dark:border-slate-800">
-                    <span className={cn('flex items-center gap-1', dias !== null && dias >= 0 && dias <= 7 ? 'font-semibold text-amber-700 dark:text-amber-400' : 'text-slate-500')}>
+                  <div className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-slate-100 pt-3 text-xs dark:border-slate-800">
+                    <span className={cn('flex items-center gap-1', dias !== null && dias >= 0 && dias <= 7 ? 'font-semibold text-brand-700 dark:text-brand-300' : 'text-slate-500')}>
                       <CalendarClock className="h-3.5 w-3.5" />
                       {c.proximaAssembleia ? `Assembleia ${tempoRelativoAgenda(c.proximaAssembleia, now).toLowerCase()} (${formatData(c.proximaAssembleia, { ano: false })})` : 'Assembleia não informada'}
                     </span>
                     {c.pretendeLance && <span className="text-slate-500">· Lance: {SIM_NAO_TALVEZ[c.pretendeLance]}</span>}
                     {precisaPedirIndicacao(c, now) && (
-                      <span className="rounded bg-violet-50 px-1.5 py-0.5 font-medium text-violet-700 dark:bg-violet-500/15 dark:text-violet-300">Pedir indicação</span>
+                      <span className="font-medium text-brand-700 dark:text-brand-300">· Pedir indicação</span>
                     )}
                   </div>
                 )}
@@ -259,7 +259,7 @@ function ClienteModal({ cliente: c, onFechar }: { cliente: Cliente | null; onFec
   return (
     <Modal aberto onFechar={onFechar} titulo={c.nome} subtitulo={formatTelefone(c.telefone)} tamanho="lg">
       <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
-        <a href={linkTelefone(c.telefone)} className="flex h-11 items-center justify-center gap-2 rounded-xl bg-sky-600 text-sm font-semibold text-white hover:bg-sky-700">
+        <a href={linkTelefone(c.telefone)} className="flex h-11 items-center justify-center gap-2 rounded-full bg-brand-600 text-sm font-semibold text-white hover:bg-brand-700">
           Ligar
         </a>
         <Button variante="whatsapp" className="h-11" icone={<WhatsAppIcon className="h-4 w-4" />} onClick={() => abrirWhatsApp(c.telefone)}>

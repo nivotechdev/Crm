@@ -1,13 +1,12 @@
 import { useMemo, useRef, useState, type ReactNode } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, CalendarPlus, Check, ChevronDown, ClipboardEdit, Phone, Send, Trash2 } from 'lucide-react';
+import { ArrowLeft, Check, ChevronDown, ClipboardEdit, Phone, Send, Trash2 } from 'lucide-react';
 import type { Lead, Temperatura } from '../types';
 import { useData } from '../store/DataContext';
 import { useAcoes } from '../store/AcoesContext';
 import { useToast } from '../store/ToastContext';
 import { useNow } from '../store/NowContext';
 import { useHotkeys } from '../hooks/useHotkeys';
-import { corEtapa } from '../lib/etapas';
 import { formatData, formatHora, fromInputDate, tempoRelativoAgenda } from '../lib/dates';
 import { formatTelefone } from '../lib/format';
 import { MOTIVOS_PERDA, OBJETIVOS, SIM_NAO_TALVEZ, TEMPERATURAS, URGENCIAS, opcoes } from '../lib/labels';
@@ -94,13 +93,13 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
   const etapaAtual = config.etapas.find((e) => e.id === lead.etapaId);
 
   return (
-    <div className="mx-auto max-w-6xl px-3 py-4 md:px-6 md:py-6">
+    <div className="mx-auto max-w-6xl px-4 py-5 md:px-8 md:py-8">
       <button onClick={() => (window.history.length > 1 ? navigate(-1) : navigate('/leads'))} className="mb-3 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-900 dark:hover:text-white">
         <ArrowLeft className="h-4 w-4" /> Voltar
       </button>
 
       {/* Cabeçalho */}
-      <Card className="mb-4 overflow-visible p-4 sm:p-5">
+      <Card className="mb-4 overflow-visible p-5 sm:p-6">
         <div className="flex items-start gap-3">
           <Avatar nome={lead.nome} className="h-12 w-12 text-base" />
           <div className="min-w-0 flex-1">
@@ -120,13 +119,9 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
                 aria-checked={lead.temperatura === t}
                 onClick={() => salvar({ temperatura: t })}
                 className={cn(
-                  'rounded-lg px-2.5 py-1 text-xs font-semibold ring-1 ring-inset',
+                  'rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-inset',
                   lead.temperatura === t
-                    ? t === 'quente'
-                      ? 'bg-red-500 text-white ring-red-500'
-                      : t === 'morno'
-                        ? 'bg-amber-500 text-white ring-amber-500'
-                        : 'bg-sky-500 text-white ring-sky-500'
+                    ? 'bg-slate-900 text-white ring-slate-900 dark:bg-white dark:text-slate-900 dark:ring-white'
                     : 'text-slate-500 ring-slate-200 hover:bg-slate-50 dark:ring-slate-700 dark:hover:bg-slate-800',
                 )}
               >
@@ -141,14 +136,14 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
           <a
             href={linkTelefone(lead.telefone)}
             onClick={() => contatoRapido(lead, 'ligacao')}
-            className="flex h-12 items-center justify-center gap-2 rounded-xl bg-sky-600 text-sm font-semibold text-white shadow-sm hover:bg-sky-700 active:scale-[.98]"
+            className="flex h-12 items-center justify-center gap-2 rounded-full bg-brand-600 text-sm font-semibold text-white transition-colors hover:bg-brand-700 active:scale-[.98]"
           >
             <Phone className="h-5 w-5" /> Ligar
           </a>
           <div className="relative flex">
             <button
               onClick={() => contatoRapido(lead, 'whatsapp')}
-              className="flex h-12 flex-1 items-center justify-center gap-2 rounded-l-xl bg-[#1fa855] text-sm font-semibold text-white shadow-sm hover:bg-[#178a45] active:scale-[.98]"
+              className="flex h-12 flex-1 items-center justify-center gap-2 rounded-l-full bg-[#1DA851] pl-2 text-sm font-semibold text-white transition-colors hover:bg-[#178a45] active:scale-[.98]"
             >
               <WhatsAppIcon className="h-5 w-5" /> WhatsApp
             </button>
@@ -156,14 +151,14 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
               aria-label="Escolher modelo de mensagem"
               aria-expanded={menuWpp}
               onClick={() => setMenuWpp((m) => !m)}
-              className="flex h-12 w-9 items-center justify-center rounded-r-xl border-l border-white/25 bg-[#1fa855] text-white hover:bg-[#178a45]"
+              className="flex h-12 w-10 items-center justify-center rounded-r-full border-l border-white/25 bg-[#1DA851] pr-1 text-white hover:bg-[#178a45]"
             >
               <ChevronDown className="h-4 w-4" />
             </button>
             {menuWpp && (
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setMenuWpp(false)} />
-                <div className="absolute left-0 right-0 top-full z-20 mt-1 min-w-[240px] rounded-xl bg-white p-1 shadow-xl ring-1 ring-slate-200 dark:bg-slate-800 dark:ring-slate-700 sm:left-auto">
+                <div className="absolute left-0 right-0 top-full z-20 mt-1 min-w-[240px] rounded-2xl border border-slate-200/80 bg-white p-1.5 shadow-pop dark:border-slate-700 dark:bg-slate-800 sm:left-auto">
                   <p className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-slate-400">Abrir com modelo</p>
                   {config.modelos.map((m) => (
                     <button
@@ -188,7 +183,7 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
             <button
               onClick={() => setMenuRegistrar((m) => !m)}
               aria-expanded={menuRegistrar}
-              className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-white text-sm font-semibold text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-600 dark:hover:bg-slate-700"
+              className="flex h-12 w-full items-center justify-center gap-2 rounded-full border border-slate-200 bg-white text-sm font-semibold text-slate-800 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
             >
               <ClipboardEdit className="h-5 w-5" /> <span className="hidden sm:inline">Registrar contato</span>
               <span className="sm:hidden">Registrar</span>
@@ -196,7 +191,7 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
             {menuRegistrar && (
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setMenuRegistrar(false)} />
-                <div className="absolute right-0 top-full z-20 mt-1 w-56 rounded-xl bg-white p-1 shadow-xl ring-1 ring-slate-200 dark:bg-slate-800 dark:ring-slate-700">
+                <div className="absolute right-0 top-full z-20 mt-1 w-56 rounded-2xl border border-slate-200/80 bg-white p-1.5 shadow-pop dark:border-slate-700 dark:bg-slate-800">
                   <button
                     className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm hover:bg-slate-100 dark:hover:bg-slate-700"
                     onClick={() => {
@@ -204,7 +199,7 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
                       contatoRapido(lead, 'ligacao');
                     }}
                   >
-                    <Phone className="h-4 w-4 text-sky-600" /> Liguei
+                    <Phone className="h-4 w-4 text-brand-600" /> Liguei
                   </button>
                   <button
                     className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm hover:bg-slate-100 dark:hover:bg-slate-700"
@@ -234,9 +229,9 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
                 className={cn(
                   'flex shrink-0 items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium transition-colors',
                   atual
-                    ? 'bg-brand-600 text-white shadow-sm'
+                    ? 'bg-brand-600 text-white'
                     : passada
-                      ? 'bg-brand-50 text-brand-700 hover:bg-brand-100 dark:bg-brand-500/15 dark:text-brand-300'
+                      ? 'bg-brand-50 text-brand-700 hover:bg-brand-100 dark:bg-brand-500/10 dark:text-brand-300'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700',
                 )}
               >
@@ -254,7 +249,7 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
               className={cn(
                 'shrink-0 rounded-full px-3 py-1.5 text-xs font-medium ring-1 ring-inset',
                 e.id === lead.etapaId
-                  ? cn(corEtapa(e).chip, 'ring-current')
+                  ? e.tipo === 'ganho' ? 'bg-emerald-600 text-white ring-emerald-600' : 'bg-red-600 text-white ring-red-600'
                   : e.tipo === 'ganho'
                     ? 'text-emerald-700 ring-emerald-200 hover:bg-emerald-50 dark:text-emerald-300 dark:ring-emerald-500/30 dark:hover:bg-emerald-500/10'
                     : 'text-rose-700 ring-rose-200 hover:bg-rose-50 dark:text-rose-300 dark:ring-rose-500/30 dark:hover:bg-rose-500/10',
@@ -275,20 +270,20 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
 
       {/* Próximo passo */}
       <Card className="mb-4">
-        <CardHeader titulo="Próximo passo" icone={<CalendarPlus className="h-4 w-4" />} />
-        <div className="px-4 pb-4 sm:px-5">
+        <CardHeader titulo="Próximo passo" />
+        <div className="px-5 pb-5">
           {pendentes.length > 0 ? (
             <ul className="mb-3 space-y-1.5">
               {pendentes.map((t) => {
                 const atrasada = t.dataHora < new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
                 return (
-                  <li key={t.id} className="flex items-center gap-3 rounded-lg bg-slate-50 px-3 py-2 dark:bg-slate-800/60">
+                  <li key={t.id} className="flex items-center gap-3 rounded-2xl bg-slate-50 px-3.5 py-2.5 dark:bg-slate-800/60">
                     <button
                       aria-label="Concluir"
                       onClick={() => alternarTarefa(t.id, true).then(() => toast('Tarefa concluída', { acao: { label: 'Desfazer', onClick: () => alternarTarefa(t.id, false) } }))}
-                      className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full ring-2 ring-slate-300 hover:bg-emerald-500 hover:text-white hover:ring-emerald-500 dark:ring-slate-600"
+                      className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 border-slate-300 text-transparent hover:border-emerald-500 hover:bg-emerald-500 hover:text-white dark:border-slate-600"
                     >
-                      <Check className="h-3.5 w-3.5 opacity-0 hover:opacity-100" />
+                      <Check className="h-3.5 w-3.5" strokeWidth={3} />
                     </button>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium">{t.titulo}</p>
@@ -315,7 +310,7 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
               <input
                 type="date"
                 autoFocus
-                className="h-8 rounded-lg border-0 px-2 text-xs ring-2 ring-brand-500 dark:bg-slate-800"
+                className="h-8 rounded-full border border-brand-500 px-3 text-xs outline-none ring-4 ring-brand-500/15 dark:bg-slate-800"
                 onChange={(e) => {
                   const iso = fromInputDate(e.target.value);
                   if (iso) agendar(iso);
@@ -347,7 +342,7 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
           {/* Dados */}
           <Card className={cn(aba !== 'dados' && 'hidden md:block')}>
             <CardHeader titulo="Dados do lead" subtitulo="Clique em qualquer campo para editar" />
-            <div className="px-4 pb-4 sm:px-5">
+            <div className="px-5 pb-5">
               <Secao titulo="Contato">
                 <CampoLinha label="Telefone">
                   <InlineText valor={formatTelefone(lead.telefone)} inputMode="tel" onSalvar={(v) => v && salvar({ telefone: v })} />
@@ -434,7 +429,7 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
 
           <Card className={cn(aba !== 'simulacao' && 'hidden md:block')}>
             <CardHeader titulo="Simulação rápida" subtitulo="Informe os dados da administradora" />
-            <div className="px-4 pb-4 sm:px-5">
+            <div className="px-5 pb-5">
               <Simulator lead={lead} />
             </div>
           </Card>
@@ -443,7 +438,7 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
         {/* Histórico */}
         <Card className={cn(aba !== 'historico' && 'hidden md:block', 'md:self-start')}>
           <CardHeader titulo="Linha do tempo" subtitulo={`${historico.length} registros`} />
-          <div className="px-4 pb-5 sm:px-5">
+          <div className="px-5 pb-6">
             <div className="mb-5 flex gap-2">
               <textarea
                 ref={notaRef}
@@ -457,9 +452,9 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
                 }}
                 rows={1}
                 placeholder="Adicionar anotação… (Enter para salvar)"
-                className="min-h-[40px] flex-1 resize-none rounded-lg border-0 bg-slate-50 px-3 py-2 text-sm ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-brand-500 dark:bg-slate-800 dark:ring-slate-700"
+                className="min-h-[44px] flex-1 resize-none rounded-[22px] border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none placeholder:text-slate-400 focus:border-brand-500 focus:bg-white focus:ring-4 focus:ring-brand-500/15 dark:border-slate-700 dark:bg-slate-800"
               />
-              <Button variante="primario" aria-label="Salvar anotação" onClick={enviarNota} disabled={!nota.trim()} className="h-10 w-10 px-0">
+              <Button variante="primario" aria-label="Salvar anotação" onClick={enviarNota} disabled={!nota.trim()} className="h-11 w-11 shrink-0 px-0">
                 <Send className="h-4 w-4" />
               </Button>
             </div>
@@ -474,7 +469,7 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
 function Secao({ titulo, children }: { titulo: string; children: ReactNode }) {
   return (
     <div className="mb-3">
-      <h3 className="mb-1 mt-2 text-[11px] font-semibold uppercase tracking-wide text-slate-400">{titulo}</h3>
+      <h3 className="mb-1 mt-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-400">{titulo}</h3>
       {children}
     </div>
   );

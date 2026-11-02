@@ -57,7 +57,7 @@ export default function AgendaPage() {
   }, [aba, semana]);
 
   return (
-    <div className="mx-auto max-w-4xl px-3 py-4 md:px-6 md:py-6">
+    <div className="mx-auto max-w-3xl px-4 py-5 md:px-8 md:py-8">
       <PageHeader
         titulo="Agenda"
         subtitulo="Retornos, reuniões e tarefas"
@@ -93,7 +93,7 @@ export default function AgendaPage() {
         ) : grupos ? (
           grupos.map(([dia, itens]) => (
             <div key={dia}>
-              <p className="border-b border-slate-100 bg-slate-50 px-4 py-1.5 text-xs font-semibold text-slate-500 dark:border-slate-800 dark:bg-slate-800/50">
+              <p className="px-5 pb-1 pt-4 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-400">
                 {formatDiaSemana(itens[0].dataHora)}
               </p>
               <ul className="divide-y divide-slate-100 dark:divide-slate-800">

@@ -67,23 +67,23 @@ export function ContactOutcomeSheet({ contato, onFechar }: { contato: ContatoEmA
 
   const chip = (ativo: boolean) =>
     cn(
-      'rounded-full px-3 py-1.5 text-xs font-medium transition-colors ring-1 ring-inset',
+      'rounded-full border px-3 py-1.5 text-xs font-medium transition-colors',
       ativo
-        ? 'bg-brand-600 text-white ring-brand-600'
-        : 'bg-white text-slate-700 ring-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-700 dark:hover:bg-slate-700',
+        ? 'border-slate-900 bg-slate-900 text-white dark:border-white dark:bg-white dark:text-slate-900'
+        : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200',
     );
 
   return (
     <div
       role="region"
       aria-label="Resultado do contato"
-      className="fixed inset-x-2 bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-40 animate-slide-up rounded-2xl bg-white p-4 shadow-2xl ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-700 md:inset-x-auto md:bottom-6 md:right-6 md:w-[400px]"
+      className="fixed inset-x-2 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-40 animate-slide-up rounded-[26px] border border-slate-200/80 bg-white p-5 shadow-pop dark:border-slate-700 dark:bg-slate-900 md:inset-x-auto md:bottom-6 md:right-6 md:w-[400px]"
     >
       <div className="mb-3 flex items-start gap-3">
         <div
           className={cn(
             'flex h-9 w-9 shrink-0 items-center justify-center rounded-full',
-            canal === 'ligacao' ? 'bg-sky-100 text-sky-700 dark:bg-sky-500/20 dark:text-sky-300' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300',
+            canal === 'ligacao' ? 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300' : 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-300',
           )}
         >
           {canal === 'ligacao' ? <Phone className="h-4 w-4" /> : <WhatsAppIcon className="h-4 w-4" />}
@@ -110,8 +110,8 @@ export function ContactOutcomeSheet({ contato, onFechar }: { contato: ContatoEmA
         </button>
       </div>
 
-      <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-400">Resultado (opcional)</p>
-      <div className="mb-3 flex flex-wrap gap-1.5">
+      <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-400">Resultado (opcional)</p>
+      <div className="mb-4 flex flex-wrap gap-1.5">
         {RESULTADOS_POR_CANAL[canal].map((r) => (
           <button key={r} className={chip(resultado === r)} onClick={() => escolherResultado(r)} aria-pressed={resultado === r}>
             {RESULTADOS[r]}
@@ -125,10 +125,10 @@ export function ContactOutcomeSheet({ contato, onFechar }: { contato: ContatoEmA
         onBlur={salvarObs}
         onKeyDown={(e) => e.key === 'Enter' && (salvarObs(), (e.target as HTMLInputElement).blur())}
         placeholder="Observação curta…"
-        className="mb-3 h-10 w-full rounded-lg border-0 bg-slate-50 px-3 text-sm text-slate-900 ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-brand-500 dark:bg-slate-800 dark:text-slate-100 dark:ring-slate-700"
+        className="mb-4 h-10 w-full rounded-full border border-slate-200 bg-slate-50 px-4 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-brand-500 focus:bg-white focus:ring-4 focus:ring-brand-500/15 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
       />
 
-      <p className="mb-1.5 flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+      <p className="mb-1.5 flex items-center gap-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-400">
         <CalendarPlus className="h-3.5 w-3.5" /> Próximo contato
       </p>
       {agendado ? (
@@ -150,7 +150,7 @@ export function ContactOutcomeSheet({ contato, onFechar }: { contato: ContatoEmA
               type="date"
               autoFocus
               min={new Date().toISOString().slice(0, 10)}
-              className="h-8 rounded-full border-0 bg-white px-3 text-xs ring-2 ring-brand-500 dark:bg-slate-800 dark:text-slate-100"
+              className="h-8 rounded-full border border-brand-500 bg-white px-3 text-xs outline-none ring-4 ring-brand-500/15 dark:bg-slate-800 dark:text-slate-100"
               onChange={(e) => {
                 const iso = fromInputDate(e.target.value);
                 if (iso) agendar(iso);
@@ -166,7 +166,7 @@ export function ContactOutcomeSheet({ contato, onFechar }: { contato: ContatoEmA
 
       {canal === 'whatsapp' && config.modelos.length > 0 && (
         <div className="mt-3 border-t border-slate-100 pt-3 dark:border-slate-800">
-          <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-400">Reabrir com modelo</p>
+          <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-400">Reabrir com modelo</p>
           <div className="flex gap-1.5 overflow-x-auto pb-1">
             {config.modelos.map((m) => (
               <button

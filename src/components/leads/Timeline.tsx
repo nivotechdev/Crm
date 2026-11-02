@@ -12,12 +12,12 @@ import { WhatsAppIcon } from '../ui/WhatsAppIcon';
 import { EmptyState } from '../ui/EmptyState';
 
 const ICONES: Record<Atividade['tipo'], { Icone: (p: { className?: string }) => JSX.Element; cls: string; titulo: string }> = {
-  ligacao: { Icone: (p) => <Phone {...p} />, cls: 'bg-sky-100 text-sky-700 dark:bg-sky-500/20 dark:text-sky-300', titulo: 'Ligação' },
-  whatsapp: { Icone: (p) => <WhatsAppIcon {...p} />, cls: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300', titulo: 'WhatsApp' },
-  nota: { Icone: (p) => <StickyNote {...p} />, cls: 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300', titulo: 'Anotação' },
-  etapa: { Icone: (p) => <ArrowRight {...p} />, cls: 'bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300', titulo: 'Mudança de etapa' },
-  simulacao: { Icone: (p) => <Calculator {...p} />, cls: 'bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-500/20 dark:text-fuchsia-300', titulo: 'Simulação (estimativa)' },
-  sistema: { Icone: (p) => <Flag {...p} />, cls: 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300', titulo: 'Sistema' },
+  ligacao: { Icone: (p) => <Phone {...p} />, cls: 'bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300', titulo: 'Ligação' },
+  whatsapp: { Icone: (p) => <WhatsAppIcon {...p} />, cls: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-300', titulo: 'WhatsApp' },
+  nota: { Icone: (p) => <StickyNote {...p} />, cls: 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400', titulo: 'Anotação' },
+  etapa: { Icone: (p) => <ArrowRight {...p} />, cls: 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400', titulo: 'Mudança de etapa' },
+  simulacao: { Icone: (p) => <Calculator {...p} />, cls: 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400', titulo: 'Simulação (estimativa)' },
+  sistema: { Icone: (p) => <Flag {...p} />, cls: 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400', titulo: 'Sistema' },
 };
 
 function rotuloDia(iso: string, now: Date) {
@@ -48,8 +48,8 @@ export function Timeline({ atividades, motivoPerda }: { atividades: Atividade[];
     <div className="space-y-5">
       {grupos.map((g) => (
         <div key={g.dia}>
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">{g.dia}</p>
-          <ol className="relative space-y-3 border-l border-slate-200 pl-5 dark:border-slate-700">
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-400">{g.dia}</p>
+          <ol className="relative space-y-4 border-l border-slate-200/80 pl-6 dark:border-slate-800">
             {g.itens.map((a) => {
               const meta = ICONES[a.tipo];
               const de = a.etapaDe ? etapaPorId(config, a.etapaDe)?.nome : undefined;
@@ -57,7 +57,7 @@ export function Timeline({ atividades, motivoPerda }: { atividades: Atividade[];
               const removivel = a.tipo === 'nota' || a.tipo === 'ligacao' || a.tipo === 'whatsapp';
               return (
                 <li key={a.id} className="group relative">
-                  <span className={cn('absolute -left-[33px] flex h-6 w-6 items-center justify-center rounded-full ring-4 ring-white dark:ring-slate-900', meta.cls)}>
+                  <span className={cn('absolute -left-[37px] flex h-6 w-6 items-center justify-center rounded-full ring-4 ring-white dark:ring-slate-900', meta.cls)}>
                     <meta.Icone className="h-3.5 w-3.5" />
                   </span>
                   <div className="flex items-start gap-2">
@@ -73,7 +73,7 @@ export function Timeline({ atividades, motivoPerda }: { atividades: Atividade[];
                           )}
                         </span>
                         {a.resultado && (
-                          <span className="ml-2 rounded-md bg-slate-100 px-1.5 py-0.5 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                          <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                             {RESULTADOS[a.resultado]}
                           </span>
                         )}

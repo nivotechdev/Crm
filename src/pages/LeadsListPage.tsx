@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckSquare, Columns3, Plus, Search, SlidersHorizontal, Tag, Trash2, Users, X } from 'lucide-react';
 import type { Objetivo, Temperatura } from '../types';
@@ -16,8 +16,11 @@ import { Button } from '../components/ui/Button';
 import { Chip } from '../components/ui/Chip';
 import { Select, inputBase } from '../components/ui/Field';
 import { EmptyState } from '../components/ui/EmptyState';
-import { LeadCardMobile, LeadRow } from '../components/leads/LeadListItem';
+import { LeadCard } from '../components/leads/LeadListItem';
 import { PageHeader } from '../components/layout/PageHeader';
+
+const selectEscuro =
+  'select-chevron h-9 rounded-full border-0 bg-white/10 pl-3 pr-7 text-[13px] font-medium text-white focus:outline-none focus:ring-2 focus:ring-white/40 [&>option]:text-slate-900';
 
 export default function LeadsListPage() {
   const { leads, config, moverEtapaEmMassa, atualizarLeadsEmMassa, adicionarEtiquetaEmMassa, excluirLeads } = useData();
@@ -27,6 +30,7 @@ export default function LeadsListPage() {
   const d = useDerivados();
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
+  const gradeRef = useRef<HTMLDivElement>(null);
 
   const filtro = (params.get('filtro') as FiltroRapido | null) ?? null;
   const setFiltro = (f: FiltroRapido | null) => {
@@ -46,17 +50,14 @@ export default function LeadsListPage() {
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
   const [selecionados, setSelecionados] = useState<Set<string>>(new Set());
   const [modoSelecao, setModoSelecao] = useState(false);
-  const [foco, setFoco] = useState(0);
+  const [foco, setFoco] = useState(-1);
   const [etiquetaMassa, setEtiquetaMassa] = useState<string | null>(null);
 
   useEffect(() => prefs.set('lista:ordem', ordem), [ordem]);
 
   const ctxFiltro = { retornoHojeIds: d.retornoHojeIds, vermelhoApartirDe: config.laranjaAteDias + 1, now };
 
-  const base = useMemo(
-    () => leads.filter((l) => (incluirFechados || etapa ? true : d.isAtivo(l))),
-    [leads, incluirFechados, etapa, d],
-  );
+  const base = useMemo(() => leads.filter((l) => (incluirFechados || etapa ? true : d.isAtivo(l))), [leads, incluirFechados, etapa, d]);
 
   const contagens = useMemo(() => {
     const c = {} as Record<FiltroRapido, number>;
@@ -79,7 +80,7 @@ export default function LeadsListPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [base, busca, filtro, etapa, temp, objetivo, origem, ordem, d.proximaTarefaPorLead, now]);
 
-  useEffect(() => setFoco((f) => Math.min(f, Math.max(0, lista.length - 1))), [lista.length]);
+  useEffect(() => setFoco((f) => Math.min(f, lista.length - 1)), [lista.length]);
 
   const alternar = (id: string) =>
     setSelecionados((s) => {
@@ -94,30 +95,44 @@ export default function LeadsListPage() {
     setModoSelecao(false);
   };
 
-  const focado = lista[foco];
-  const rolarPara = (i: number) =>
+  // Navegação por teclado na grade
+  const colunas = () => {
+    const g = gradeRef.current;
+    return g ? getComputedStyle(g).gridTemplateColumns.split(' ').length : 1;
+  };
+  const moverFoco = (delta: number) => {
+    const i = Math.max(0, Math.min(lista.length - 1, (foco < 0 ? -1 : foco) + delta));
+    setFoco(i);
     requestAnimationFrame(() => document.querySelector(`[data-lead-id="${lista[i]?.id}"]`)?.scrollIntoView({ block: 'nearest' }));
+  };
+  const focado = foco >= 0 ? lista[foco] : undefined;
 
   useHotkeys({
-    j: () => (setFoco((f) => Math.min(lista.length - 1, f + 1)), rolarPara(foco + 1)),
-    arrowdown: () => (setFoco((f) => Math.min(lista.length - 1, f + 1)), rolarPara(foco + 1)),
-    k: () => (setFoco((f) => Math.max(0, f - 1)), rolarPara(foco - 1)),
-    arrowup: () => (setFoco((f) => Math.max(0, f - 1)), rolarPara(foco - 1)),
+    j: () => moverFoco(1),
+    k: () => moverFoco(-1),
+    arrowright: () => moverFoco(1),
+    arrowleft: () => moverFoco(-1),
+    arrowdown: () => moverFoco(colunas()),
+    arrowup: () => moverFoco(-colunas()),
     l: () => focado && contatoRapido(focado, 'ligacao'),
     w: () => focado && contatoRapido(focado, 'whatsapp'),
     enter: () => focado && navigate(`/leads/${focado.id}`),
-    x: () => focado && alternar(focado.id),
+    x: () => {
+      if (!focado) return;
+      setModoSelecao(true);
+      alternar(focado.id);
+    },
   });
 
   const nSel = selecionados.size;
   const ids = [...selecionados];
-  const filtrosAvancadosAtivos = [etapa, temp, objetivo, origem].filter(Boolean).length + (incluirFechados ? 1 : 0);
+  const filtrosAvancados = [etapa, temp, objetivo, origem].filter(Boolean).length + (incluirFechados ? 1 : 0);
 
   return (
-    <div className="mx-auto max-w-7xl px-3 py-4 md:px-6 md:py-6">
+    <div className="mx-auto max-w-[1400px] px-4 py-5 md:px-8 md:py-8">
       <PageHeader
         titulo="Leads"
-        subtitulo={`${lista.length} ${lista.length === 1 ? 'lead' : 'leads'}${!incluirFechados && !etapa ? ' ativos' : ''}`}
+        subtitulo={`${lista.length} ${lista.length === 1 ? 'lead' : 'leads'}${!incluirFechados && !etapa ? ' ativos' : ''} · ordenados por ${ORDENACOES.find((o) => o.value === ordem)?.label.toLowerCase()}`}
         acoes={
           <>
             <Link to="/funil" className="hidden sm:block">
@@ -130,47 +145,48 @@ export default function LeadsListPage() {
         }
       />
 
-      {/* Busca + ordenação */}
+      {/* Busca + controles */}
       <div className="mb-3 flex gap-2">
         <div className="relative min-w-0 flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
-            placeholder="Filtrar por nome, telefone, cidade ou etiqueta"
-            className={cn(inputBase, 'h-10 pl-9')}
+            placeholder="Buscar por nome, telefone, cidade…"
+            className={cn(inputBase, 'h-11 rounded-full pl-10')}
             aria-label="Filtrar leads"
           />
           {busca && (
-            <button aria-label="Limpar busca" onClick={() => setBusca('')} className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-400 hover:text-slate-700">
+            <button aria-label="Limpar busca" onClick={() => setBusca('')} className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-slate-400 hover:text-slate-700">
               <X className="h-4 w-4" />
             </button>
           )}
         </div>
-        <div className="hidden w-56 shrink-0 sm:block">
-          <Select value={ordem} onChange={(e) => setOrdem(e.target.value as Ordenacao)} opcoes={ORDENACOES} aria-label="Ordenar por" />
+        <div className="hidden w-60 shrink-0 sm:block">
+          <Select value={ordem} onChange={(e) => setOrdem(e.target.value as Ordenacao)} opcoes={ORDENACOES} aria-label="Ordenar por" className="rounded-full" />
         </div>
         <Button
           onClick={() => setMostrarFiltros((m) => !m)}
-          icone={<SlidersHorizontal className="h-4 w-4" />}
           aria-expanded={mostrarFiltros}
-          className={cn(filtrosAvancadosAtivos > 0 && 'ring-brand-400 text-brand-700 dark:text-brand-300')}
+          aria-label="Mais filtros"
+          className={cn('h-11 px-3.5', filtrosAvancados > 0 && 'border-brand-300 text-brand-700 dark:border-brand-500/40 dark:text-brand-300')}
         >
-          <span className="hidden sm:inline">Filtros</span>
-          {filtrosAvancadosAtivos > 0 && <span className="rounded-full bg-brand-600 px-1.5 text-[11px] text-white">{filtrosAvancadosAtivos}</span>}
+          <SlidersHorizontal className="h-4 w-4" />
+          {filtrosAvancados > 0 && <span className="num">{filtrosAvancados}</span>}
         </Button>
         <Button
-          className="md:hidden"
           aria-label="Selecionar vários"
+          title="Selecionar vários (X)"
           onClick={() => (modoSelecao ? limparSelecao() : setModoSelecao(true))}
           variante={modoSelecao ? 'primario' : 'secundario'}
+          className="h-11 px-3.5"
         >
           <CheckSquare className="h-4 w-4" />
         </Button>
       </div>
 
       {/* Filtros rápidos (1 clique) */}
-      <div className="no-scrollbar -mx-3 mb-3 flex gap-2 overflow-x-auto px-3 md:mx-0 md:flex-wrap md:px-0">
+      <div className="no-scrollbar -mx-4 mb-5 flex gap-2 overflow-x-auto px-4 md:mx-0 md:flex-wrap md:px-0">
         <Chip ativo={!filtro} onClick={() => setFiltro(null)}>
           Todos
         </Chip>
@@ -182,15 +198,17 @@ export default function LeadsListPage() {
       </div>
 
       {mostrarFiltros && (
-        <div className="mb-3 grid animate-fade-in grid-cols-2 gap-2 rounded-xl bg-white p-3 ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800 md:grid-cols-6">
-          <Select value={ordem} onChange={(e) => setOrdem(e.target.value as Ordenacao)} opcoes={ORDENACOES} className="col-span-2 sm:hidden" aria-label="Ordenar por" />
+        <div className="mb-5 grid animate-fade-in grid-cols-2 gap-2 rounded-3xl border border-slate-200/70 bg-white p-3 dark:border-slate-800 dark:bg-slate-900 md:grid-cols-3 lg:grid-cols-6">
+          <div className="col-span-2 sm:hidden">
+            <Select value={ordem} onChange={(e) => setOrdem(e.target.value as Ordenacao)} opcoes={ORDENACOES} aria-label="Ordenar por" />
+          </div>
           <Select value={etapa} onChange={(e) => setEtapa(e.target.value)} vazio="Todas as etapas" opcoes={config.etapas.map((e) => ({ value: e.id, label: e.nome }))} aria-label="Etapa" />
           <Select value={temp} onChange={(e) => setTemp(e.target.value as Temperatura)} vazio="Temperatura" opcoes={opcoes(TEMPERATURAS)} aria-label="Temperatura" />
           <Select value={objetivo} onChange={(e) => setObjetivo(e.target.value as Objetivo)} vazio="Objetivo" opcoes={opcoes(OBJETIVOS)} aria-label="Objetivo" />
           <Select value={origem} onChange={(e) => setOrigem(e.target.value)} vazio="Origem" opcoes={config.origens.map((o) => ({ value: o, label: o }))} aria-label="Origem" />
-          <label className="flex items-center gap-2 px-1 text-sm text-slate-600 dark:text-slate-300">
+          <label className="flex items-center gap-2 px-2 text-[13px] text-slate-600 dark:text-slate-300">
             <input type="checkbox" checked={incluirFechados} onChange={(e) => setIncluirFechados(e.target.checked)} className="h-4 w-4 accent-brand-600" />
-            Incluir ganhos/perdidos
+            Ganhos e perdidos
           </label>
           <Button
             variante="fantasma"
@@ -202,20 +220,59 @@ export default function LeadsListPage() {
               setIncluirFechados(false);
             }}
           >
-            Limpar filtros
+            Limpar
           </Button>
         </div>
       )}
 
-      {/* Ações em massa */}
+      {modoSelecao && nSel === 0 && <p className="mb-3 text-[13px] text-slate-500">Toque nos cards para selecionar.</p>}
+
+      {lista.length === 0 ? (
+        <div className="rounded-3xl border border-slate-200/70 bg-white dark:border-slate-800 dark:bg-slate-900">
+          {leads.length === 0 ? (
+            <EmptyState
+              icone={<Users className="h-6 w-6" />}
+              titulo="Nenhum lead ainda"
+              descricao="Cadastre o primeiro lead com só nome e telefone."
+              acao={<Button variante="primario" icone={<Plus className="h-4 w-4" />} onClick={() => abrirNovoLead()}>Novo lead</Button>}
+            />
+          ) : filtro === 'nao_contatados_hoje' ? (
+            <EmptyState icone={<CheckSquare className="h-6 w-6" />} titulo="Todos os leads foram contatados hoje" descricao="Ótimo trabalho. Que tal pedir indicações aos clientes?" />
+          ) : (
+            <EmptyState icone={<Search className="h-6 w-6" />} titulo="Nenhum lead com esses filtros" acao={<Button onClick={() => (setFiltro(null), setBusca(''))}>Limpar filtros</Button>} />
+          )}
+        </div>
+      ) : (
+        <div ref={gradeRef} role="list" className="grid grid-cols-2 gap-2.5 sm:gap-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          {lista.map((l, i) => (
+            <LeadCard
+              key={l.id}
+              lead={l}
+              proxima={d.proximaTarefaPorLead.get(l.id)}
+              selecionado={selecionados.has(l.id)}
+              focado={i === foco}
+              modoSelecao={modoSelecao}
+              onSelecionar={alternar}
+              onFocar={() => setFoco(i)}
+            />
+          ))}
+        </div>
+      )}
+
+      <p className="mt-6 hidden text-center text-xs text-slate-400 md:block">
+        Teclado: <kbd className="font-sans font-semibold">J</kbd>/<kbd className="font-sans font-semibold">K</kbd> navegar · <kbd className="font-sans font-semibold">L</kbd> ligação ·{' '}
+        <kbd className="font-sans font-semibold">W</kbd> WhatsApp · <kbd className="font-sans font-semibold">X</kbd> selecionar
+      </p>
+
+      {/* Barra de ações em massa */}
       {nSel > 0 && (
-        <div className="sticky top-14 z-10 mb-3 flex flex-wrap items-center gap-2 rounded-xl bg-brand-600 p-2 pl-4 text-sm text-white shadow-lg md:top-[7.5rem] lg:top-16">
+        <div className="fixed inset-x-3 bottom-[calc(5.25rem+env(safe-area-inset-bottom))] z-30 mx-auto flex max-w-2xl animate-slide-up flex-wrap items-center gap-2 rounded-[22px] bg-slate-900 p-2 pl-4 text-sm text-white shadow-pop dark:bg-slate-800 md:bottom-6 md:left-60">
           <span className="font-semibold">
             {nSel} selecionado{nSel > 1 && 's'}
           </span>
           <select
             aria-label="Mover selecionados para etapa"
-            className="h-8 rounded-lg border-0 bg-white/15 pl-2 pr-7 text-sm text-white focus:ring-2 focus:ring-white [&>option]:text-slate-900"
+            className={selectEscuro}
             value=""
             onChange={async (e) => {
               if (!e.target.value) return;
@@ -226,7 +283,7 @@ export default function LeadsListPage() {
               limparSelecao();
             }}
           >
-            <option value="">Mover para…</option>
+            <option value="">Etapa…</option>
             {config.etapas.map((e) => (
               <option key={e.id} value={e.id}>
                 {e.nome}
@@ -235,7 +292,7 @@ export default function LeadsListPage() {
           </select>
           <select
             aria-label="Alterar temperatura dos selecionados"
-            className="h-8 rounded-lg border-0 bg-white/15 pl-2 pr-7 text-sm text-white focus:ring-2 focus:ring-white [&>option]:text-slate-900"
+            className={selectEscuro}
             value=""
             onChange={async (e) => {
               if (!e.target.value) return;
@@ -252,7 +309,7 @@ export default function LeadsListPage() {
             ))}
           </select>
           {etiquetaMassa === null ? (
-            <button className="flex h-8 items-center gap-1 rounded-lg bg-white/15 px-2.5 hover:bg-white/25" onClick={() => setEtiquetaMassa('')}>
+            <button className="flex h-9 items-center gap-1.5 rounded-full bg-white/10 px-3 text-[13px] font-medium hover:bg-white/20" onClick={() => setEtiquetaMassa('')}>
               <Tag className="h-4 w-4" /> Etiqueta
             </button>
           ) : (
@@ -264,7 +321,6 @@ export default function LeadsListPage() {
                 if (!et) return setEtiquetaMassa(null);
                 await adicionarEtiquetaEmMassa(ids, et);
                 toast(`Etiqueta "${et}" adicionada a ${nSel} leads`);
-                setEtiquetaMassa(null);
                 limparSelecao();
               }}
             >
@@ -274,15 +330,16 @@ export default function LeadsListPage() {
                 onChange={(e) => setEtiquetaMassa(e.target.value)}
                 onKeyDown={(e) => e.key === 'Escape' && (e.stopPropagation(), setEtiquetaMassa(null))}
                 placeholder="Nova etiqueta"
-                className="h-8 w-36 rounded-lg border-0 bg-white px-2 text-sm text-slate-900 focus:ring-2 focus:ring-white"
+                className="h-9 w-32 rounded-full border-0 bg-white px-3 text-[13px] text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-400"
               />
-              <button type="submit" className="h-8 rounded-lg bg-white/15 px-2.5 font-medium hover:bg-white/25">
-                Adicionar
+              <button type="submit" className="h-9 rounded-full bg-brand-600 px-3 text-[13px] font-semibold hover:bg-brand-700">
+                OK
               </button>
             </form>
           )}
           <button
-            className="flex h-8 items-center gap-1 rounded-lg bg-white/15 px-2.5 hover:bg-red-500"
+            aria-label="Excluir selecionados"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 hover:bg-red-500"
             onClick={async () => {
               if (!(await confirmar({ titulo: `Excluir ${nSel} lead${nSel > 1 ? 's' : ''}?`, mensagem: 'O histórico, tarefas e simulações também serão apagados. Não é possível desfazer.', confirmarLabel: 'Excluir', perigo: true })))
                 return;
@@ -291,81 +348,12 @@ export default function LeadsListPage() {
               limparSelecao();
             }}
           >
-            <Trash2 className="h-4 w-4" /> Excluir
+            <Trash2 className="h-4 w-4" />
           </button>
-          <button className="ml-auto rounded-lg p-1.5 hover:bg-white/15" aria-label="Limpar seleção" onClick={limparSelecao}>
+          <button className="ml-auto flex h-9 w-9 items-center justify-center rounded-full hover:bg-white/10" aria-label="Cancelar seleção" onClick={limparSelecao}>
             <X className="h-4 w-4" />
           </button>
         </div>
-      )}
-
-      {lista.length === 0 ? (
-        <div className="rounded-2xl bg-white ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
-          {leads.length === 0 ? (
-            <EmptyState
-              icone={<Users className="h-6 w-6" />}
-              titulo="Nenhum lead ainda"
-              descricao="Cadastre o primeiro lead com só nome e telefone."
-              acao={<Button variante="primario" icone={<Plus className="h-4 w-4" />} onClick={() => abrirNovoLead()}>Novo lead</Button>}
-            />
-          ) : filtro === 'nao_contatados_hoje' ? (
-            <EmptyState icone={<CheckSquare className="h-6 w-6" />} titulo="Todos os leads foram contatados hoje! 🎉" descricao="Ótimo trabalho. Que tal pedir indicações aos clientes?" />
-          ) : (
-            <EmptyState icone={<Search className="h-6 w-6" />} titulo="Nenhum lead com esses filtros" acao={<Button onClick={() => (setFiltro(null), setBusca(''))}>Limpar filtros</Button>} />
-          )}
-        </div>
-      ) : (
-        <>
-          {/* Desktop */}
-          <div className="hidden overflow-hidden rounded-2xl bg-white ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800 md:block">
-            <div className="grid grid-cols-[28px_minmax(180px,1.6fr)_minmax(110px,0.9fr)_150px_minmax(150px,1fr)_auto] items-center gap-3 border-b border-slate-200 bg-slate-50 py-2 pl-5 pr-3 text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-400">
-              <input
-                type="checkbox"
-                aria-label="Selecionar todos"
-                checked={nSel > 0 && nSel === lista.length}
-                onChange={(e) => setSelecionados(e.target.checked ? new Set(lista.map((l) => l.id)) : new Set())}
-                className="h-4 w-4 accent-brand-600"
-              />
-              <span>Lead</span>
-              <span>Carta / objetivo</span>
-              <span>Etapa</span>
-              <span>Último contato</span>
-              <span className="w-[214px] text-right">Registrar contato</span>
-            </div>
-            <div role="list">
-              {lista.map((l, i) => (
-                <LeadRow
-                  key={l.id}
-                  lead={l}
-                  proxima={d.proximaTarefaPorLead.get(l.id)}
-                  selecionado={selecionados.has(l.id)}
-                  focado={i === foco}
-                  onSelecionar={alternar}
-                  onFocar={() => setFoco(i)}
-                />
-              ))}
-            </div>
-          </div>
-          {/* Celular */}
-          <div role="list" className="space-y-2 md:hidden">
-            {lista.map((l, i) => (
-              <LeadCardMobile
-                key={l.id}
-                lead={l}
-                proxima={d.proximaTarefaPorLead.get(l.id)}
-                selecionado={selecionados.has(l.id)}
-                focado={i === foco}
-                onSelecionar={alternar}
-                onFocar={() => setFoco(i)}
-                modoSelecao={modoSelecao}
-              />
-            ))}
-          </div>
-          <p className="mt-3 hidden text-center text-xs text-slate-400 md:block">
-            Dica: use <kbd className="rounded bg-slate-100 px-1 dark:bg-slate-800">J</kbd>/<kbd className="rounded bg-slate-100 px-1 dark:bg-slate-800">K</kbd> para navegar,{' '}
-            <kbd className="rounded bg-slate-100 px-1 dark:bg-slate-800">L</kbd> para registrar ligação e <kbd className="rounded bg-slate-100 px-1 dark:bg-slate-800">W</kbd> para WhatsApp.
-          </p>
-        </>
       )}
     </div>
   );

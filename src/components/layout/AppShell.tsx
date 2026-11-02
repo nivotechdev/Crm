@@ -30,7 +30,7 @@ export function AppShell() {
   });
 
   return (
-    <div className="flex min-h-dvh bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+    <div className="flex min-h-dvh bg-[color:var(--app-bg)] text-slate-900 dark:text-slate-100">
       <a href="#conteudo" className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-white focus:px-3 focus:py-2">
         Pular para o conteúdo
       </a>
@@ -44,9 +44,9 @@ export function AppShell() {
       <button
         onClick={() => abrirNovoLead()}
         aria-label="Novo lead"
-        className="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom))] right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-brand-600 text-white shadow-lg shadow-brand-600/30 active:scale-95 md:hidden"
+        className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] right-[max(1rem,env(safe-area-inset-right))] z-30 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-600 text-white shadow-[0_10px_24px_-6px_rgba(238,74,6,0.55)] transition-transform active:scale-95 md:hidden"
       >
-        <Plus className="h-7 w-7" />
+        <Plus className="h-6 w-6" strokeWidth={2.5} />
       </button>
       <BottomNav />
       <CommandPalette />

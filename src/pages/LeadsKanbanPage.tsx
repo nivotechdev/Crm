@@ -61,10 +61,10 @@ export default function LeadsKanbanPage() {
   };
 
   return (
-    <div className="flex h-[calc(100dvh-3.5rem)] flex-col px-3 pt-4 md:h-[calc(100dvh-6.25rem)] md:px-6 md:pt-6 lg:h-[calc(100dvh-3.5rem)]">
+    <div className="flex h-[calc(100dvh-4rem)] flex-col px-4 pt-5 md:h-[calc(100dvh-7.25rem)] md:px-8 md:pt-8 lg:h-[calc(100dvh-4rem)]">
       <PageHeader
         titulo="Funil de vendas"
-        subtitulo="Arraste os cards entre as etapas (no celular: segure e arraste, ou use o seletor de etapa)"
+        subtitulo="Arraste os cards entre as etapas"
         acoes={
           <Link to="/leads">
             <Button icone={<List className="h-4 w-4" />}>
@@ -73,14 +73,14 @@ export default function LeadsKanbanPage() {
           </Link>
         }
       />
-      <div className="mb-3 flex flex-col gap-2 md:flex-row md:items-center">
+      <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-center">
         <div className="relative md:w-72">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-          <input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Filtrar cards" className={cn(inputBase, 'h-9 pl-9')} aria-label="Filtrar cards" />
+          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Filtrar cards" className={cn(inputBase, 'h-10 rounded-full pl-10')} aria-label="Filtrar cards" />
         </div>
-        <div className="no-scrollbar -mx-3 flex gap-2 overflow-x-auto px-3 md:mx-0 md:px-0">
+        <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 md:mx-0 md:px-0">
           {FILTROS_RAPIDOS.map((f) => (
-            <Chip key={f.id} ativo={filtro === f.id} onClick={() => setFiltro(filtro === f.id ? null : f.id)} className="h-8 text-xs">
+            <Chip key={f.id} ativo={filtro === f.id} onClick={() => setFiltro(filtro === f.id ? null : f.id)} className="h-9">
               {f.label}
             </Chip>
           ))}
@@ -88,7 +88,7 @@ export default function LeadsKanbanPage() {
       </div>
 
       <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd} onDragCancel={() => setArrastando(null)}>
-        <div className="-mx-3 flex flex-1 snap-x snap-mandatory gap-3 overflow-x-auto px-3 pb-24 md:mx-0 md:snap-none md:px-0 md:pb-4">
+        <div className="-mx-4 flex flex-1 snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-24 md:mx-0 md:snap-none md:px-0 md:pb-6">
           {colunas.map((c) => (
             <Coluna key={c.etapa.id} etapa={c.etapa} itens={c.itens} total={c.total} proxima={d.proximaTarefaPorLead} />
           ))}
@@ -107,16 +107,16 @@ function Coluna({ etapa, itens, total, proxima }: { etapa: Etapa; itens: Lead[];
       ref={setNodeRef}
       aria-label={`Etapa ${etapa.nome}`}
       className={cn(
-        'flex w-[85vw] shrink-0 snap-center flex-col rounded-2xl bg-slate-100/80 transition-colors dark:bg-slate-900/60 sm:w-72',
-        isOver && 'bg-brand-50 ring-2 ring-brand-400 dark:bg-brand-500/10',
+        'flex w-[82vw] shrink-0 snap-center flex-col rounded-3xl bg-slate-100/70 transition-colors dark:bg-slate-900/50 sm:w-[17rem]',
+        isOver && 'bg-brand-50 ring-2 ring-brand-300 dark:bg-brand-500/10',
       )}
     >
-      <header className="flex items-center gap-2 px-3 pb-2 pt-3">
-        <span className={cn('h-2.5 w-2.5 rounded-full', cor.dot)} />
+      <header className="flex items-center gap-2 px-4 pb-1 pt-4">
+        <span className={cn('h-2 w-2 rounded-full', cor.dot)} />
         <h2 className="flex-1 truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{etapa.nome}</h2>
-        <span className="rounded-full bg-white px-2 text-xs font-semibold tabular-nums text-slate-600 dark:bg-slate-800 dark:text-slate-300">{itens.length}</span>
+        <span className="num text-xs font-semibold text-slate-400">{itens.length}</span>
       </header>
-      <p className="-mt-1 px-3 pb-2 text-xs text-slate-500 dark:text-slate-400">
+      <p className="num px-4 pb-3 text-xs text-slate-400">
         {formatBRLCompacto(total)} em cartas
         {etapa.tipo !== 'aberta' && ' · últimos 30 dias'}
       </p>
@@ -125,7 +125,7 @@ function Coluna({ etapa, itens, total, proxima }: { etapa: Etapa; itens: Lead[];
           <ArrastavelCard key={l.id} lead={l} proxima={proxima.get(l.id)} />
         ))}
         {itens.length === 0 && (
-          <div className="rounded-xl border-2 border-dashed border-slate-200 px-3 py-6 text-center text-xs text-slate-400 dark:border-slate-700">Solte um card aqui</div>
+          <div className="rounded-2xl border border-dashed border-slate-300 px-3 py-8 text-center text-xs text-slate-400 dark:border-slate-700">Solte um card aqui</div>
         )}
       </div>
     </section>
@@ -155,14 +155,14 @@ const CardKanban = memo(function CardKanban({
   return (
     <article
       className={cn(
-        'relative overflow-hidden rounded-xl bg-white py-2.5 pl-3.5 pr-2.5 shadow-sm ring-1 ring-slate-200 dark:bg-slate-800 dark:ring-slate-700',
-        overlay && 'rotate-2 shadow-xl ring-2 ring-brand-400',
+        'relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white py-3 pl-4 pr-3 shadow-card dark:border-slate-800 dark:bg-slate-900',
+        overlay && 'rotate-2 border-brand-300 shadow-pop',
       )}
     >
       <ContactStripe ultimoContatoEm={lead.ultimoContatoEm} />
       <div className="flex items-start gap-1" {...dragHandle} style={{ touchAction: 'manipulation' }}>
         <Link to={`/leads/${lead.id}`} className="min-w-0 flex-1 cursor-pointer" onClick={(e) => overlay && e.preventDefault()}>
-          <p className="truncate text-sm font-semibold text-slate-900 hover:text-brand-700 dark:text-white">{lead.nome}</p>
+          <p className="truncate text-sm font-semibold tracking-tight text-slate-900 hover:text-brand-700 dark:text-white">{lead.nome}</p>
           <p className="truncate text-xs text-slate-500 dark:text-slate-400">
             {lead.objetivo ? OBJETIVOS[lead.objetivo] : '—'} · {formatBRLCompacto(lead.valorCarta)}
           </p>
@@ -176,11 +176,9 @@ const CardKanban = memo(function CardKanban({
         <TemperaturaBadge temperatura={lead.temperatura} soIcone />
         <ProximoPassoBadge tarefa={proxima} />
       </div>
-      <div className="mt-2 flex items-center justify-between gap-2">
-        <div className="min-w-0 md:hidden">
-          <EtapaSelect lead={lead} className="max-w-[9.5rem]" />
-        </div>
-        <QuickContactButtons lead={lead} tamanho="sm" className="ml-auto" />
+      <div className="mt-3 flex flex-col gap-2">
+        <EtapaSelect lead={lead} className="md:hidden" />
+        <QuickContactButtons lead={lead} tamanho="sm" bloco />
       </div>
     </article>
   );

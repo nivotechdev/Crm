@@ -137,7 +137,7 @@ export function NewLeadModal({ aberto, onFechar, prefill }: { aberto: boolean; o
         )}
 
         <div>
-          <p className="mb-1 text-xs font-medium text-slate-600 dark:text-slate-400">Objetivo</p>
+          <p className="mb-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">Objetivo</p>
           <div className="flex flex-wrap gap-1.5">
             {opcoes(OBJETIVOS).map((o) => (
               <button
@@ -145,10 +145,10 @@ export function NewLeadModal({ aberto, onFechar, prefill }: { aberto: boolean; o
                 key={o.value}
                 onClick={() => set('objetivo', f.objetivo === o.value ? '' : o.value)}
                 className={cn(
-                  'rounded-full px-3 py-1.5 text-xs font-medium ring-1 ring-inset',
+                  'rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors',
                   f.objetivo === o.value
-                    ? 'bg-brand-600 text-white ring-brand-600'
-                    : 'text-slate-700 ring-slate-200 hover:bg-slate-50 dark:text-slate-300 dark:ring-slate-700 dark:hover:bg-slate-800',
+                    ? 'border-slate-900 bg-slate-900 text-white dark:border-white dark:bg-white dark:text-slate-900'
+                    : 'border-slate-200 text-slate-700 hover:border-slate-300 dark:border-slate-700 dark:text-slate-300',
                 )}
               >
                 {o.label}
@@ -160,7 +160,7 @@ export function NewLeadModal({ aberto, onFechar, prefill }: { aberto: boolean; o
         <button
           type="button"
           onClick={() => setMais((m) => !m)}
-          className="flex items-center gap-1 text-sm font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400"
+          className="flex items-center gap-1 text-sm font-semibold text-brand-700 hover:text-brand-800 dark:text-brand-400"
         >
           <ChevronDown className={cn('h-4 w-4 transition-transform', mais && 'rotate-180')} />
           {mais ? 'Menos detalhes' : 'Mais detalhes (opcional)'}

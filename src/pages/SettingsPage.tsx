@@ -76,7 +76,7 @@ export default function SettingsPage() {
   const atualizarModelo = (id: string, patch: Partial<ModeloMensagem>) => set('modelos', cfg.modelos.map((m) => (m.id === id ? { ...m, ...patch } : m)));
 
   return (
-    <div className="mx-auto max-w-4xl px-3 py-4 md:px-6 md:py-6">
+    <div className="mx-auto max-w-3xl px-4 py-5 md:px-8 md:py-8">
       <PageHeader titulo="Configurações" />
 
       <div className="space-y-4">
@@ -98,7 +98,7 @@ export default function SettingsPage() {
 
         <Card>
           <CardHeader titulo="Indicador de último contato" subtitulo="Defina os intervalos de cada cor" />
-          <div className="px-4 pb-5 sm:px-5">
+          <div className="px-5 pb-6">
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Amarelo: de 1 dia até (dias)">
                 <Stepper valor={cfg.amareloAteDias} min={1} max={60} onChange={(v) => set('amareloAteDias', v)} />
@@ -110,7 +110,7 @@ export default function SettingsPage() {
             {erroFaixas && <p className="mt-2 text-sm font-medium text-red-600">{erroFaixas}</p>}
             <div className="mt-4 flex flex-wrap gap-2">
               {(Object.entries(descricaoFaixas(cfg)) as Array<[NivelContato, string]>).map(([nivel, desc]) => (
-                <span key={nivel} className={cn('inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ring-1 ring-inset', NIVEL_ESTILO[nivel].badge)}>
+                <span key={nivel} className={cn('inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium', NIVEL_ESTILO[nivel].badge)}>
                   <span className={cn('h-2 w-2 rounded-full', NIVEL_ESTILO[nivel].ponto)} />
                   {nivel.charAt(0).toUpperCase() + nivel.slice(1)}: {desc}
                 </span>
@@ -129,7 +129,7 @@ export default function SettingsPage() {
               </Button>
             }
           />
-          <ul className="divide-y divide-slate-100 px-4 pb-3 dark:divide-slate-800 sm:px-5">
+          <ul className="divide-y divide-slate-100 px-5 pb-4 dark:divide-slate-800">
             {abertas.map((e, i) => (
               <EtapaLinha
                 key={e.id}
@@ -149,10 +149,10 @@ export default function SettingsPage() {
 
         <Card>
           <CardHeader titulo="Origens de lead" />
-          <div className="px-4 pb-5 sm:px-5">
+          <div className="px-5 pb-6">
             <div className="mb-3 flex flex-wrap gap-2">
               {cfg.origens.map((o, i) => (
-                <span key={i} className="inline-flex items-center gap-1 rounded-lg bg-slate-100 py-1 pl-1 pr-1 dark:bg-slate-800">
+                <span key={i} className="inline-flex items-center gap-1 rounded-full bg-slate-100 py-1 pl-2 pr-1 dark:bg-slate-800">
                   <input
                     value={o}
                     onChange={(e) => set('origens', cfg.origens.map((x, j) => (j === i ? e.target.value : x)))}
@@ -193,7 +193,7 @@ export default function SettingsPage() {
               </Button>
             }
           />
-          <div className="space-y-4 px-4 pb-5 sm:px-5">
+          <div className="space-y-4 px-5 pb-6">
             {cfg.modelos.map((m) => (
               <ModeloEditor key={m.id} modelo={m} cfg={cfg} onChange={(p) => atualizarModelo(m.id, p)} onRemover={() => set('modelos', cfg.modelos.filter((x) => x.id !== m.id))} />
             ))}
@@ -203,7 +203,7 @@ export default function SettingsPage() {
 
         <Card>
           <CardHeader titulo="Aparência" />
-          <div className="px-4 pb-5 sm:px-5">
+          <div className="px-5 pb-6">
             <Segmented
               valor={tema}
               onChange={setTema}
@@ -218,7 +218,7 @@ export default function SettingsPage() {
 
         <Card>
           <CardHeader titulo="Dados" subtitulo="Por enquanto os dados ficam salvos neste navegador (localStorage)" />
-          <div className="flex flex-wrap gap-2 px-4 pb-5 sm:px-5">
+          <div className="flex flex-wrap gap-2 px-5 pb-6">
             <Button
               icone={<Download className="h-4 w-4" />}
               onClick={async () => {
@@ -262,7 +262,7 @@ export default function SettingsPage() {
       </div>
 
       {sujo && (
-        <div className="fixed inset-x-3 bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-30 mx-auto flex max-w-xl animate-slide-up items-center gap-3 rounded-2xl bg-slate-900 p-3 pl-4 text-sm text-white shadow-2xl dark:bg-slate-800 md:bottom-6">
+        <div className="fixed inset-x-3 bottom-[calc(5.25rem+env(safe-area-inset-bottom))] z-30 mx-auto flex max-w-xl animate-slide-up items-center gap-3 rounded-[22px] bg-slate-900 p-2 pl-5 text-sm text-white shadow-pop dark:bg-slate-800 md:bottom-6 md:left-60">
           <span className="flex-1">Você tem alterações não salvas</span>
           <Button variante="fantasma" className="text-slate-300 hover:bg-white/10 hover:text-white" onClick={() => setCfg(data.config)}>
             Descartar
@@ -357,7 +357,7 @@ function ModeloEditor({ modelo, cfg, onChange, onRemover }: { modelo: ModeloMens
     });
   };
   return (
-    <div className="rounded-xl ring-1 ring-slate-200 dark:ring-slate-700">
+    <div className="rounded-3xl border border-slate-200/80 dark:border-slate-700">
       <div className="flex items-center gap-2 border-b border-slate-100 p-2 dark:border-slate-800">
         <Input value={modelo.nome} onChange={(e) => onChange({ nome: e.target.value })} className="h-9 font-medium" aria-label="Nome do modelo" />
         <IconButton label="Remover modelo" onClick={onRemover} className="hover:text-red-600">
@@ -369,13 +369,13 @@ function ModeloEditor({ modelo, cfg, onChange, onRemover }: { modelo: ModeloMens
           <Textarea ref={ref} rows={4} value={modelo.texto} onChange={(e) => onChange({ texto: e.target.value })} aria-label="Texto do modelo" />
           <div className="mt-1.5 flex flex-wrap gap-1">
             {VARIAVEIS_MODELO.map((v) => (
-              <button key={v} onClick={() => inserir(v)} className="rounded-md bg-brand-50 px-1.5 py-0.5 font-mono text-[11px] text-brand-700 hover:bg-brand-100 dark:bg-brand-500/15 dark:text-brand-300">
+              <button key={v} onClick={() => inserir(v)} className="rounded-full bg-slate-100 px-2 py-0.5 font-mono text-[11px] text-slate-600 hover:bg-brand-50 hover:text-brand-700 dark:bg-slate-800 dark:text-slate-300">
                 {v}
               </button>
             ))}
           </div>
         </div>
-        <div className="rounded-lg bg-[#e7f9ee] p-3 text-sm text-slate-800 dark:bg-emerald-950/40 dark:text-emerald-50">
+        <div className="rounded-2xl rounded-tl-md bg-[#E7F8EC] p-4 text-sm text-slate-800 dark:bg-emerald-950/40 dark:text-emerald-50">
           <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400">Prévia</p>
           <p className="whitespace-pre-wrap">{preencherModelo(modelo.texto, LEAD_EXEMPLO, cfg)}</p>
         </div>

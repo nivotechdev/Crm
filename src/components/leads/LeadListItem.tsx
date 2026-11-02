@@ -1,41 +1,39 @@
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
+import { Check } from 'lucide-react';
 import type { Lead, Tarefa } from '../../types';
 import { useData } from '../../store/DataContext';
 import { useAcoes } from '../../store/AcoesContext';
 import { corEtapa, etapaPorId } from '../../lib/etapas';
-import { formatBRLCompacto, formatTelefone } from '../../lib/format';
+import { formatBRLCompacto } from '../../lib/format';
 import { OBJETIVOS } from '../../lib/labels';
-import { linkTelefone } from '../../lib/whatsapp';
 import { cn } from '../../lib/cn';
 import { ContactStripe, LastContactBadge } from './LastContactBadge';
 import { ProximoPassoBadge, TemperaturaBadge } from './Badges';
 import { QuickContactButtons } from './QuickContactButtons';
 
-/** Seletor de etapa compacto (1 clique para mudar). */
+/** Seletor de etapa discreto: ponto colorido + nome (1 clique para mudar). */
 export function EtapaSelect({ lead, className }: { lead: Lead; className?: string }) {
   const { config } = useData();
   const { pedirMoverEtapa } = useAcoes();
-  const c = corEtapa(etapaPorId(config, lead.etapaId));
+  const cor = corEtapa(etapaPorId(config, lead.etapaId));
   return (
-    <select
-      aria-label="Etapa do funil"
-      value={lead.etapaId}
-      onClick={(e) => e.stopPropagation()}
-      onChange={(e) => pedirMoverEtapa(lead, e.target.value)}
-      className={cn(
-        'h-7 max-w-full cursor-pointer appearance-none truncate rounded-md border-0 py-0 pl-2 pr-6 text-xs font-medium focus:ring-2 focus:ring-brand-500',
-        'select-chevron',
-        c.chip,
-        className,
-      )}
-    >
-      {config.etapas.map((e) => (
-        <option key={e.id} value={e.id}>
-          {e.nome}
-        </option>
-      ))}
-    </select>
+    <span className={cn('relative inline-flex max-w-full items-center', className)}>
+      <span aria-hidden className={cn('pointer-events-none absolute left-2.5 h-2 w-2 rounded-full', cor.dot)} />
+      <select
+        aria-label="Etapa do funil"
+        value={lead.etapaId}
+        onClick={(e) => e.stopPropagation()}
+        onChange={(e) => pedirMoverEtapa(lead, e.target.value)}
+        className="select-chevron h-7 max-w-full cursor-pointer truncate rounded-full border-0 bg-slate-100 py-0 pl-6 pr-6 text-[11px] font-medium text-slate-700 hover:bg-slate-200/70 focus:outline-none focus:ring-2 focus:ring-brand-500/40 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+      >
+        {config.etapas.map((e) => (
+          <option key={e.id} value={e.id}>
+            {e.nome}
+          </option>
+        ))}
+      </select>
+    </span>
   );
 }
 
@@ -44,99 +42,81 @@ interface Props {
   proxima?: Tarefa;
   selecionado: boolean;
   focado: boolean;
+  modoSelecao: boolean;
   onSelecionar: (id: string) => void;
   onFocar: () => void;
 }
 
-/** Linha de lead para desktop (md+). */
-export const LeadRow = memo(function LeadRow({ lead, proxima, selecionado, focado, onSelecionar, onFocar }: Props) {
+/** Card de lead (grade: 2 colunas no celular, até 5 no desktop). */
+export const LeadCard = memo(function LeadCard({ lead, proxima, selecionado, focado, modoSelecao, onSelecionar, onFocar }: Props) {
   return (
-    <div
+    <article
       role="listitem"
       data-lead-id={lead.id}
       onMouseDown={onFocar}
       className={cn(
-        'group relative grid grid-cols-[28px_minmax(180px,1.6fr)_minmax(110px,0.9fr)_150px_minmax(150px,1fr)_auto] items-center gap-3 border-b border-slate-100 py-2.5 pl-5 pr-3 transition-colors dark:border-slate-800',
-        focado ? 'bg-brand-50/70 dark:bg-brand-500/10' : 'hover:bg-slate-50 dark:hover:bg-slate-800/40',
-        selecionado && 'bg-brand-50 dark:bg-brand-500/15',
+        'group relative flex min-w-0 flex-col overflow-hidden rounded-2xl border bg-white transition-all dark:bg-slate-900',
+        selecionado
+          ? 'border-brand-500 ring-2 ring-brand-500/20'
+          : focado
+            ? 'border-slate-300 shadow-lift dark:border-slate-600'
+            : 'border-slate-200/80 hover:border-slate-300 hover:shadow-lift dark:border-slate-800 dark:hover:border-slate-700',
       )}
     >
       <ContactStripe ultimoContatoEm={lead.ultimoContatoEm} />
-      <input
-        type="checkbox"
-        aria-label={`Selecionar ${lead.nome}`}
-        checked={selecionado}
-        onChange={() => onSelecionar(lead.id)}
-        className="h-4 w-4 accent-brand-600"
-      />
-      <div className="min-w-0">
-        <Link to={`/leads/${lead.id}`} className="block truncate text-sm font-semibold text-slate-900 hover:text-brand-700 dark:text-white dark:hover:text-brand-300">
-          {lead.nome}
-        </Link>
-        <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-          <a href={linkTelefone(lead.telefone)} className="tabular-nums hover:underline" onClick={(e) => e.stopPropagation()}>
-            {formatTelefone(lead.telefone)}
-          </a>
-          {lead.cidade && <span className="truncate">· {lead.cidade}</span>}
-        </div>
-      </div>
-      <div className="min-w-0 text-sm">
-        <p className="truncate font-medium text-slate-800 dark:text-slate-200">{formatBRLCompacto(lead.valorCarta)}</p>
-        <p className="truncate text-xs text-slate-500 dark:text-slate-400">{lead.objetivo ? OBJETIVOS[lead.objetivo] : '—'}</p>
-      </div>
-      <div className="flex min-w-0 flex-col items-start gap-1">
-        <EtapaSelect lead={lead} />
-        <TemperaturaBadge temperatura={lead.temperatura} />
-      </div>
-      <div className="flex min-w-0 flex-col items-start gap-1">
-        <LastContactBadge ultimoContatoEm={lead.ultimoContatoEm} canal={lead.ultimoContatoCanal} />
-        <ProximoPassoBadge tarefa={proxima} />
-      </div>
-      <QuickContactButtons lead={lead} />
-    </div>
-  );
-});
 
-/** Card de lead para celular. */
-export const LeadCardMobile = memo(function LeadCardMobile({ lead, proxima, selecionado, onSelecionar, modoSelecao }: Props & { modoSelecao: boolean }) {
-  return (
-    <div
-      role="listitem"
-      className={cn(
-        'relative overflow-hidden rounded-xl bg-white py-3 pl-4 pr-3 ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800',
-        selecionado && 'ring-2 ring-brand-500',
+      {modoSelecao && (
+        <button
+          type="button"
+          aria-label={selecionado ? `Desmarcar ${lead.nome}` : `Selecionar ${lead.nome}`}
+          aria-pressed={selecionado}
+          onClick={() => onSelecionar(lead.id)}
+          className={cn(
+            'absolute right-2.5 top-2.5 z-10 flex h-6 w-6 items-center justify-center rounded-full border-2 transition-colors',
+            selecionado ? 'border-brand-600 bg-brand-600 text-white' : 'border-slate-300 bg-white text-transparent dark:border-slate-600 dark:bg-slate-900',
+          )}
+        >
+          <Check className="h-3.5 w-3.5" strokeWidth={3} />
+        </button>
       )}
-    >
-      <ContactStripe ultimoContatoEm={lead.ultimoContatoEm} />
-      <div className="flex items-start gap-3">
-        {modoSelecao && (
-          <input
-            type="checkbox"
-            aria-label={`Selecionar ${lead.nome}`}
-            checked={selecionado}
-            onChange={() => onSelecionar(lead.id)}
-            className="mt-1 h-5 w-5 accent-brand-600"
-          />
-        )}
-        <Link to={`/leads/${lead.id}`} className="min-w-0 flex-1">
+
+      <Link
+        to={`/leads/${lead.id}`}
+        onClick={(e) => {
+          if (modoSelecao) {
+            e.preventDefault();
+            onSelecionar(lead.id);
+          }
+        }}
+        className="flex flex-1 flex-col gap-2.5 py-3.5 pl-4 pr-3 focus-visible:outline-none sm:pl-[18px]"
+      >
+        <div className={cn('min-w-0', modoSelecao && 'pr-6')}>
           <div className="flex items-center gap-1.5">
-            <p className="truncate text-[15px] font-semibold text-slate-900 dark:text-white">{lead.nome}</p>
-            <TemperaturaBadge temperatura={lead.temperatura} soIcone />
+            <h3 className="line-clamp-2 text-[14px] font-semibold leading-snug tracking-tight text-slate-900 group-hover:text-brand-700 dark:text-white dark:group-hover:text-brand-300">
+              {lead.nome}
+            </h3>
           </div>
-          <p className="truncate text-xs text-slate-500 dark:text-slate-400">
-            {lead.objetivo ? OBJETIVOS[lead.objetivo] : 'Objetivo —'} · {formatBRLCompacto(lead.valorCarta)}
-            {lead.cidade && ` · ${lead.cidade}`}
+          <p className="mt-0.5 truncate text-xs text-slate-500 dark:text-slate-400">
+            {lead.objetivo ? OBJETIVOS[lead.objetivo].split('/')[0] : 'Sem objetivo'}
+            {lead.cidade && <span className="hidden sm:inline"> · {lead.cidade}</span>}
           </p>
-        </Link>
-        <LastContactBadge ultimoContatoEm={lead.ultimoContatoEm} canal={lead.ultimoContatoCanal} compacto />
-      </div>
-      <div className="mt-2.5 flex items-center gap-2">
-        <div className="flex min-w-0 flex-1 flex-col items-start gap-1">
-          <EtapaSelect lead={lead} />
+        </div>
+
+        <div className="flex items-baseline justify-between gap-2">
+          <span className="num text-[15px] font-bold tracking-tight text-slate-900 dark:text-white">{formatBRLCompacto(lead.valorCarta)}</span>
+          <TemperaturaBadge temperatura={lead.temperatura} soIcone />
+        </div>
+
+        <div className="flex flex-col items-start gap-1.5">
+          <LastContactBadge ultimoContatoEm={lead.ultimoContatoEm} canal={lead.ultimoContatoCanal} compacto />
           <ProximoPassoBadge tarefa={proxima} />
         </div>
-        <QuickContactButtons lead={lead} />
+      </Link>
+
+      <div className="flex flex-col gap-2 border-t border-slate-100 py-2.5 pl-4 pr-3 dark:border-slate-800 sm:pl-[18px]">
+        <EtapaSelect lead={lead} />
+        <QuickContactButtons lead={lead} tamanho="sm" bloco />
       </div>
-    </div>
+    </article>
   );
 });

@@ -14,10 +14,10 @@ export function Chip({
       type="button"
       aria-pressed={ativo}
       className={cn(
-        'inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-500',
+        'inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3.5 text-[13px] font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-500',
         ativo
-          ? 'bg-brand-600 text-white shadow-sm'
-          : 'bg-white text-slate-700 ring-1 ring-inset ring-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700 dark:hover:bg-slate-700',
+          ? 'border-slate-900 bg-slate-900 text-white dark:border-white dark:bg-white dark:text-slate-900'
+          : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-slate-700',
         className,
       )}
       {...rest}
@@ -27,7 +27,7 @@ export function Chip({
         <span
           className={cn(
             'rounded-full px-1.5 text-xs tabular-nums',
-            ativo ? 'bg-white/20' : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300',
+            ativo ? 'text-white/70 dark:text-slate-500' : 'text-slate-400',
           )}
         >
           {contador}
@@ -41,7 +41,7 @@ export function Tag({ children, className }: { children: ReactNode; className?: 
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-md bg-slate-100 px-1.5 py-0.5 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300',
+        'inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300',
         className,
       )}
     >

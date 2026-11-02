@@ -1,10 +1,10 @@
-import { Phone, Target } from 'lucide-react';
+import { Phone } from 'lucide-react';
 import { useData } from '../../store/DataContext';
 import { useDerivados } from '../../hooks/useDerivados';
 import { cn } from '../../lib/cn';
 import { WhatsAppIcon } from '../ui/WhatsAppIcon';
 
-/** "Contatados hoje: X de Y" + ligações/WhatsApps + barra da meta. */
+/** "Contatados hoje: X de Y" + ligações/WhatsApps + progresso da meta. */
 export function DailyCounter({ compacto }: { compacto?: boolean }) {
   const { config } = useData();
   const d = useDerivados();
@@ -14,47 +14,44 @@ export function DailyCounter({ compacto }: { compacto?: boolean }) {
 
   if (compacto)
     return (
-      <div className="flex items-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-300" aria-label="Contatos de hoje">
-        <span className="tabular-nums">
+      <div className="flex items-center gap-3 text-xs font-medium text-slate-500 dark:text-slate-400" aria-label="Contatos de hoje">
+        <span className="num" title="Leads ativos contatados hoje">
           <b className="text-slate-900 dark:text-white">{d.ativosContatadosHoje}</b>/{d.leadsAtivos.length}
         </span>
-        <span className="flex items-center gap-0.5 tabular-nums text-sky-700 dark:text-sky-300">
-          <Phone className="h-3 w-3" />
+        <span className="num flex items-center gap-1" title="Ligações hoje">
+          <Phone className="h-3.5 w-3.5 text-brand-600 dark:text-brand-400" />
           {d.ligacoesHoje}
         </span>
-        <span className="flex items-center gap-0.5 tabular-nums text-emerald-700 dark:text-emerald-300">
-          <WhatsAppIcon className="h-3 w-3" />
+        <span className="num flex items-center gap-1" title="WhatsApps hoje">
+          <WhatsAppIcon className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
           {d.whatsappsHoje}
         </span>
       </div>
     );
 
   return (
-    <div className="flex items-center gap-4 text-sm" aria-label="Contatos de hoje">
-      <div className="text-slate-600 dark:text-slate-300">
-        Contatados hoje:{' '}
-        <b className="tabular-nums text-slate-900 dark:text-white">
+    <div className="flex items-center gap-4 rounded-full border border-slate-200/80 bg-white py-1.5 pl-4 pr-2 text-[13px] dark:border-slate-800 dark:bg-slate-900" aria-label="Contatos de hoje">
+      <span className="text-slate-500 dark:text-slate-400">
+        Contatados hoje{' '}
+        <b className="num font-semibold text-slate-900 dark:text-white">
           {d.ativosContatadosHoje} de {d.leadsAtivos.length}
-        </b>{' '}
-        leads ativos
-      </div>
-      <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300">
-        <span className="flex items-center gap-1 tabular-nums" title="Ligações hoje">
-          <Phone className="h-4 w-4 text-sky-600 dark:text-sky-400" /> {d.ligacoesHoje}
+        </b>
+      </span>
+      <span className="h-4 w-px bg-slate-200 dark:bg-slate-700" />
+      <span className="num flex items-center gap-1.5 text-slate-700 dark:text-slate-200" title="Ligações hoje">
+        <Phone className="h-3.5 w-3.5 text-brand-600 dark:text-brand-400" /> {d.ligacoesHoje}
+      </span>
+      <span className="num flex items-center gap-1.5 text-slate-700 dark:text-slate-200" title="WhatsApps hoje">
+        <WhatsAppIcon className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" /> {d.whatsappsHoje}
+      </span>
+      <span className="flex items-center gap-2 rounded-full bg-slate-100 py-1 pl-2.5 pr-3 dark:bg-slate-800" title={`Meta diária: ${meta} contatos`}>
+        <span className="h-1.5 w-16 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+          <span className={cn('block h-full rounded-full transition-all', bateu ? 'bg-emerald-500' : 'bg-brand-500')} style={{ width: `${progresso}%` }} />
         </span>
-        <span className="flex items-center gap-1 tabular-nums" title="WhatsApps hoje">
-          <WhatsAppIcon className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /> {d.whatsappsHoje}
-        </span>
-      </div>
-      <div className="flex items-center gap-2" title={`Meta diária: ${meta} contatos`}>
-        <Target className={cn('h-4 w-4', bateu ? 'text-emerald-500' : 'text-slate-400')} />
-        <div className="h-2 w-24 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
-          <div className={cn('h-full rounded-full transition-all', bateu ? 'bg-emerald-500' : 'bg-brand-500')} style={{ width: `${progresso}%` }} />
-        </div>
-        <span className="tabular-nums text-xs text-slate-500 dark:text-slate-400">
+        <span className="num text-xs font-semibold text-slate-700 dark:text-slate-200">
           {d.contatosHojeTotal}/{meta}
         </span>
-      </div>
+      </span>
     </div>
   );
 }

@@ -14,7 +14,7 @@ export function CanalIcone({ canal, className = 'h-3.5 w-3.5' }: { canal?: Canal
   return null;
 }
 
-/** Badge: "Há 3 dias · 📞" com cor de urgência. */
+/** Badge: "Há 3 dias · 📞" com a cor de urgência. */
 export function LastContactBadge({
   ultimoContatoEm,
   canal,
@@ -39,23 +39,23 @@ export function LastContactBadge({
       title={titulo}
       aria-label={titulo}
       className={cn(
-        'inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full font-medium ring-1 ring-inset',
-        compacto ? 'px-2 py-0.5 text-[11px]' : 'px-2.5 py-1 text-xs',
+        'inline-flex max-w-full shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full font-medium',
+        compacto ? 'h-6 px-2 text-[11px]' : 'h-7 px-2.5 text-xs',
         estilo.badge,
         className,
       )}
     >
-      <span className={cn('h-1.5 w-1.5 rounded-full', estilo.ponto)} aria-hidden />
-      {texto}
-      {canal && ultimoContatoEm && <CanalIcone canal={canal} className="h-3.5 w-3.5 opacity-80" />}
+      <span className={cn('h-1.5 w-1.5 shrink-0 rounded-full', estilo.ponto)} aria-hidden />
+      <span className="truncate">{texto}</span>
+      {canal && ultimoContatoEm && <CanalIcone canal={canal} className="h-3 w-3 shrink-0 opacity-70" />}
     </span>
   );
 }
 
-/** Faixa lateral colorida (posicionar dentro de um container `relative`). */
+/** Faixa lateral colorida (posicionar dentro de um container `relative overflow-hidden`). */
 export function ContactStripe({ ultimoContatoEm, className }: { ultimoContatoEm?: string; className?: string }) {
   const { config } = useData();
   const now = useNow();
   const nivel = nivelContato(ultimoContatoEm, config, now);
-  return <span aria-hidden className={cn('absolute inset-y-0 left-0 w-1.5', NIVEL_ESTILO[nivel].faixa, className)} />;
+  return <span aria-hidden className={cn('absolute inset-y-0 left-0 w-1', NIVEL_ESTILO[nivel].faixa, className)} />;
 }

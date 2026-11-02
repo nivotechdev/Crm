@@ -9,9 +9,9 @@ import { formatBRL, parseValor } from '../../lib/format';
  */
 
 const display =
-  'group -mx-2 flex min-h-[36px] w-[calc(100%+1rem)] items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm text-slate-900 transition-colors hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-500 dark:text-slate-100 dark:hover:bg-slate-800';
+  'group -mx-2 flex min-h-[36px] w-[calc(100%+1rem)] items-center gap-2 rounded-xl px-2 py-1.5 text-left text-sm text-slate-900 transition-colors hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-500 dark:text-slate-100 dark:hover:bg-slate-800';
 const editor =
-  'block w-full rounded-lg border-0 bg-white px-2 py-1.5 text-sm text-slate-900 ring-2 ring-inset ring-brand-500 dark:bg-slate-800 dark:text-slate-100';
+  'block w-full rounded-xl border border-brand-500 bg-white px-2 py-1.5 text-sm text-slate-900 outline-none ring-4 ring-brand-500/15 dark:bg-slate-900 dark:text-slate-100';
 
 function Vazio({ texto = 'Adicionar' }: { texto?: string }) {
   return <span className="text-slate-400 dark:text-slate-500">{texto}</span>;
@@ -109,7 +109,7 @@ export function InlineSelect<T extends string>({
       value={valor ?? ''}
       onChange={(e) => onSalvar((e.target.value || undefined) as T | undefined)}
       className={cn(
-        '-mx-2 block min-h-[36px] w-[calc(100%+1rem)] cursor-pointer appearance-none rounded-lg border-0 bg-transparent px-2 py-1.5 text-sm text-slate-900 hover:bg-slate-100 focus:ring-2 focus:ring-brand-500 dark:text-slate-100 dark:hover:bg-slate-800',
+        '-mx-2 block min-h-[36px] w-[calc(100%+1rem)] cursor-pointer appearance-none rounded-xl border-0 bg-transparent px-2 py-1.5 text-sm text-slate-900 hover:bg-slate-50 focus:ring-2 focus:ring-brand-500/40 dark:text-slate-100 dark:hover:bg-slate-800',
         !valor && 'text-slate-400 dark:text-slate-500',
         className,
       )}
@@ -178,10 +178,10 @@ export function InlineTags({ valor, onSalvar, sugestoes = [] }: { valor: string[
       {valor.map((t) => (
         <span
           key={t}
-          className="inline-flex items-center gap-1 rounded-md bg-brand-50 py-0.5 pl-2 pr-1 text-xs font-medium text-brand-700 dark:bg-brand-500/15 dark:text-brand-300"
+          className="inline-flex items-center gap-1 rounded-full bg-slate-100 py-0.5 pl-2.5 pr-1 text-xs font-medium text-slate-700 dark:bg-slate-800 dark:text-slate-200"
         >
           {t}
-          <button aria-label={`Remover etiqueta ${t}`} className="rounded p-0.5 hover:bg-brand-100 dark:hover:bg-brand-500/20" onClick={() => onSalvar(valor.filter((x) => x !== t))}>
+          <button aria-label={`Remover etiqueta ${t}`} className="rounded p-0.5 hover:bg-slate-200 dark:hover:bg-slate-700" onClick={() => onSalvar(valor.filter((x) => x !== t))}>
             <X className="h-3 w-3" />
           </button>
         </span>
@@ -214,7 +214,7 @@ export function InlineTags({ valor, onSalvar, sugestoes = [] }: { valor: string[
       ) : (
         <button
           onClick={() => setAdicionando(true)}
-          className="inline-flex h-6 items-center gap-1 rounded-md px-1.5 text-xs font-medium text-slate-500 border border-dashed border-slate-300 hover:bg-slate-100 dark:text-slate-400 dark:border-slate-600 dark:hover:bg-slate-800"
+          className="inline-flex h-6 items-center gap-1 rounded-full px-2 text-xs font-medium text-slate-500 border border-dashed border-slate-300 hover:bg-slate-100 dark:text-slate-400 dark:border-slate-600 dark:hover:bg-slate-800"
         >
           <Plus className="h-3 w-3" /> Etiqueta
         </button>
@@ -226,8 +226,8 @@ export function InlineTags({ valor, onSalvar, sugestoes = [] }: { valor: string[
 /** Linha "rótulo: campo" usada nas fichas. */
 export function CampoLinha({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <div className="grid grid-cols-[minmax(0,40%)_minmax(0,1fr)] items-center gap-2 border-b border-slate-100 py-0.5 last:border-0 dark:border-slate-800 sm:grid-cols-[150px_minmax(0,1fr)]">
-      <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{label}</span>
+    <div className="grid grid-cols-[minmax(0,40%)_minmax(0,1fr)] items-center gap-2 py-0.5 sm:grid-cols-[150px_minmax(0,1fr)]">
+      <span className="text-[13px] text-slate-500 dark:text-slate-400">{label}</span>
       <div className="min-w-0 pr-2">{children}</div>
     </div>
   );

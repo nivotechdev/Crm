@@ -58,10 +58,10 @@ export function LostReasonModal({ lead, onFechar }: { lead: Lead | null; onFecha
             onClick={() => setMotivo(o.value)}
             aria-pressed={motivo === o.value}
             className={cn(
-              'rounded-lg px-3 py-2.5 text-left text-sm font-medium ring-1 ring-inset transition-colors',
+              'rounded-2xl border px-4 py-3 text-left text-sm font-medium transition-colors',
               motivo === o.value
-                ? 'bg-red-50 text-red-800 ring-red-300 dark:bg-red-500/15 dark:text-red-300 dark:ring-red-500/40'
-                : 'text-slate-700 ring-slate-200 hover:bg-slate-50 dark:text-slate-300 dark:ring-slate-700 dark:hover:bg-slate-800',
+                ? 'border-slate-900 bg-slate-900 text-white dark:border-white dark:bg-white dark:text-slate-900'
+                : 'border-slate-200 text-slate-700 hover:border-slate-300 dark:border-slate-700 dark:text-slate-300',
             )}
           >
             {o.label}
