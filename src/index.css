@@ -2,13 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --app-bg: #f8fafc;
+  --app-fg: #0f172a;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --app-bg: #020617;
+    --app-fg: #f1f5f9;
+    color-scheme: dark;
+  }
+}
+:root[data-theme='dark'],
+html.dark:root {
+  --app-bg: #020617;
+  --app-fg: #f1f5f9;
+  color-scheme: dark;
+}
+html.light:root {
+  --app-bg: #f8fafc;
+  --app-fg: #0f172a;
+  color-scheme: light;
+}
+
 @layer base {
   html {
     -webkit-tap-highlight-color: transparent;
     text-rendering: optimizeLegibility;
   }
   body {
-    @apply bg-slate-50 font-sans text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100;
+    @apply font-sans antialiased;
+    background: var(--app-bg);
+    color: var(--app-fg);
   }
   :root {
     color-scheme: light;

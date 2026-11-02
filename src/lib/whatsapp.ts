@@ -34,5 +34,11 @@ export function preencherModelo(texto: string, dados: DadosModelo, cfg: Pick<Con
 
 /** Abre o WhatsApp numa nova aba. Deve ser chamado direto no handler do clique. */
 export function abrirWhatsApp(telefone: string, texto?: string) {
-  window.open(linkWhatsApp(telefone, texto), '_blank', 'noopener,noreferrer');
+  const a = document.createElement('a');
+  a.href = linkWhatsApp(telefone, texto);
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
 }

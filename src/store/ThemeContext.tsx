@@ -18,20 +18,34 @@ function lerTema(): Tema {
   }
 }
 
+/** Tema do sistema: atributo data-theme do host (se houver) ou prefers-color-scheme. */
+function sistemaEstaEscuro(): boolean {
+  const dt = document.documentElement.getAttribute('data-theme');
+  if (dt === 'dark') return true;
+  if (dt === 'light') return false;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [tema, setTemaState] = useState<Tema>(lerTema);
-  const [sistemaEscuro, setSistemaEscuro] = useState(() => window.matchMedia('(prefers-color-scheme: dark)').matches);
+  const [sistemaEscuro, setSistemaEscuro] = useState(sistemaEstaEscuro);
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
-    const fn = (e: MediaQueryListEvent) => setSistemaEscuro(e.matches);
+    const fn = () => setSistemaEscuro(sistemaEstaEscuro());
     mq.addEventListener('change', fn);
-    return () => mq.removeEventListener('change', fn);
+    const obs = new MutationObserver(fn);
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => {
+      mq.removeEventListener('change', fn);
+      obs.disconnect();
+    };
   }, []);
 
   const escuro = tema === 'escuro' || (tema === 'sistema' && sistemaEscuro);
   useEffect(() => {
     document.documentElement.classList.toggle('dark', escuro);
+    document.documentElement.classList.toggle('light', !escuro);
   }, [escuro]);
 
   const setTema = (t: Tema) => {

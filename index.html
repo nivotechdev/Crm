@@ -11,7 +11,9 @@
     <script>
       try {
         var t = localStorage.getItem('crm-consorcio:tema');
-        if (t === 'escuro' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
+        var dt = document.documentElement.getAttribute('data-theme');
+        var sis = dt ? dt === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.classList.add(t === 'escuro' || (!t && sis) ? 'dark' : 'light');
       } catch (e) {}
     </script>
   </head>

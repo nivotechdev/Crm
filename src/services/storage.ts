@@ -99,9 +99,13 @@ export const db = {
 
   limparTudo() {
     cache.clear();
-    Object.keys(localStorage)
-      .filter((k) => k.startsWith(PREFIX))
-      .forEach((k) => localStorage.removeItem(k));
+    try {
+      Object.keys(localStorage)
+        .filter((k) => k.startsWith(PREFIX))
+        .forEach((k) => localStorage.removeItem(k));
+    } catch {
+      /* armazenamento indisponível */
+    }
   },
 };
 

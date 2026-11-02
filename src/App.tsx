@@ -1,5 +1,8 @@
 import { lazy, Suspense } from 'react';
-import { HashRouter, Route, Routes } from 'react-router-dom';
+import { HashRouter, MemoryRouter, Route, Routes } from 'react-router-dom';
+
+/** No modo "artifact" (página única embutida) a navegação fica em memória. */
+const Router = import.meta.env.VITE_ROUTER === 'memory' ? MemoryRouter : HashRouter;
 import { DataProvider, useData } from './store/DataContext';
 import { NowProvider } from './store/NowContext';
 import { ToastProvider } from './store/ToastContext';
@@ -53,11 +56,11 @@ export default function App() {
       <ToastProvider>
         <NowProvider>
           <DataProvider>
-            <HashRouter>
+            <Router>
               <AcoesProvider>
                 <Rotas />
               </AcoesProvider>
-            </HashRouter>
+            </Router>
           </DataProvider>
         </NowProvider>
       </ToastProvider>
