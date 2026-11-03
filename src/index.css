@@ -95,10 +95,10 @@ html.light:root {
       transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
   }
   .app-header.is-scrolled .app-island {
-    background: rgb(var(--c-surface) / 0.78);
-    border-color: rgb(var(--c-surface) / 0.7);
-    -webkit-backdrop-filter: blur(18px) saturate(1.8);
-    backdrop-filter: blur(18px) saturate(1.8);
+    background: rgb(var(--c-surface) / 0.55);
+    border-color: rgb(var(--c-surface) / 0.5);
+    -webkit-backdrop-filter: blur(24px) saturate(1.8);
+    backdrop-filter: blur(24px) saturate(1.8);
     box-shadow: 0 0 0 1px rgba(16, 20, 24, 0.07), 0 12px 36px rgba(16, 20, 24, 0.14);
     transform: translateY(2px);
   }
@@ -110,10 +110,10 @@ html.light:root {
 
   /* Vidro da pílula do celular (= ilha do topo rolada) */
   .app-glass {
-    background: rgb(var(--c-surface) / 0.78);
-    border: 1px solid rgb(var(--c-surface) / 0.7);
-    -webkit-backdrop-filter: blur(18px) saturate(1.8);
-    backdrop-filter: blur(18px) saturate(1.8);
+    background: rgb(var(--c-surface) / 0.55);
+    border: 1px solid rgb(var(--c-surface) / 0.5);
+    -webkit-backdrop-filter: blur(24px) saturate(1.8);
+    backdrop-filter: blur(24px) saturate(1.8);
     box-shadow: 0 0 0 1px rgba(16, 20, 24, 0.07), 0 12px 36px rgba(16, 20, 24, 0.14);
   }
   .num {

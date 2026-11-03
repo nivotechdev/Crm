@@ -30,10 +30,12 @@ export default {
       keyframes: {
         'slide-up': { from: { transform: 'translateY(12px)', opacity: '0' }, to: { transform: 'translateY(0)', opacity: '1' } },
         'fade-in': { from: { opacity: '0' }, to: { opacity: '1' } },
+        'page-in': { from: { opacity: '0', transform: 'translateY(6px)' }, to: { opacity: '1', transform: 'none' } },
       },
       animation: {
         'slide-up': 'slide-up .2s cubic-bezier(.2,.8,.2,1)',
         'fade-in': 'fade-in .15s ease-out',
+        'page-in': 'page-in .28s cubic-bezier(.22,1,.36,1) backwards',
       },
     },
   },

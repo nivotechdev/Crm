@@ -1,5 +1,4 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { Plus } from 'lucide-react';
 import { useAcoes } from '../../store/AcoesContext';
 import { useHotkeys } from '../../hooks/useHotkeys';
 import { cn } from '../../lib/cn';
@@ -62,17 +61,11 @@ export function AppShell() {
       </a>
       <AppNav role={ROLE} active={abaAtiva} showMobilePill={naRaizDeAba} />
       <main id="conteudo" className={cn('min-w-0 flex-1', naRaizDeAba ? 'pb-28 lg:pb-16' : 'pb-8 lg:pb-16')}>
-        <Outlet />
+        {/* Troca de tela: entrada suave (sem animação com movimento reduzido) */}
+        <div key={pathname} className="animate-page-in">
+          <Outlet />
+        </div>
       </main>
-      {naRaizDeAba && (
-      <button
-        onClick={() => abrirNovoLead()}
-        aria-label="Novo lead"
-        className="fixed bottom-[calc(5.75rem+env(safe-area-inset-bottom,0px))] right-[max(1rem,env(safe-area-inset-right,0px))] z-30 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-600 text-white shadow-[0_10px_24px_-6px_rgba(238,74,6,0.55)] transition-transform active:scale-95 lg:hidden"
-      >
-        <Plus className="h-6 w-6" strokeWidth={2.5} />
-      </button>
-      )}
       <CommandPalette />
       <ShortcutsHelp />
     </div>

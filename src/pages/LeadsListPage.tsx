@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckSquare, Plus, Search, SlidersHorizontal, Tag, Trash2, Users, X } from 'lucide-react';
 import type { Objetivo, Temperatura } from '../types';
@@ -120,6 +120,20 @@ export default function LeadsListPage() {
       else n.add(id);
       return n;
     });
+  // Segurar um card: entra no modo de seleção marcando (ou desmarcando) o card
+  const segurar = useCallback((id: string) => {
+    setModoSelecao(true);
+    setSelecionados((s) => {
+      const n = new Set(s);
+      if (n.has(id)) n.delete(id);
+      else n.add(id);
+      return n;
+    });
+  }, []);
+  // Sem nenhum card marcado, o modo de seleção termina sozinho
+  useEffect(() => {
+    if (modoSelecao && selecionados.size === 0) setModoSelecao(false);
+  }, [modoSelecao, selecionados.size]);
   const limparSelecao = () => {
     setEtiquetaMassa(null);
     setSelecionados(new Set());
@@ -178,9 +192,17 @@ export default function LeadsListPage() {
             : `${lista.length} de ${resumo[etapa]?.qtd ?? 0} leads`
         }
         acoes={
-          <Button variante="primario" icone={<Plus className="h-4 w-4" />} onClick={() => abrirNovoLead(etapaAtual?.tipo === 'aberta' ? { etapaId: etapaAtual.id } : undefined)} className="hidden md:inline-flex">
+          <button
+            type="button"
+            onClick={() => abrirNovoLead(etapaAtual?.tipo === 'aberta' ? { etapaId: etapaAtual.id } : undefined)}
+            title="Novo lead (N)"
+            className="group inline-flex h-11 items-center gap-2 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 pl-1.5 pr-4 text-sm font-semibold text-white shadow-raised transition-all hover:-translate-y-px hover:shadow-[0_10px_22px_-6px_rgba(238,74,6,0.55)] active:translate-y-0 active:scale-[.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/30"
+          >
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 transition-transform duration-300 group-hover:rotate-90">
+              <Plus className="h-[18px] w-[18px]" strokeWidth={2.6} />
+            </span>
             Novo lead
-          </Button>
+          </button>
         }
       />
 
@@ -224,15 +246,6 @@ export default function LeadsListPage() {
           <SlidersHorizontal className="h-4 w-4" />
           {filtrosAvancados > 0 && <span className="num">{filtrosAvancados}</span>}
         </Button>
-        <Button
-          aria-label="Selecionar vários"
-          title="Selecionar vários (X)"
-          onClick={() => (modoSelecao ? limparSelecao() : setModoSelecao(true))}
-          variante={modoSelecao ? 'primario' : 'secundario'}
-          className="h-11 px-3.5"
-        >
-          <CheckSquare className="h-4 w-4" />
-        </Button>
       </div>
 
       {/* Filtros rápidos (1 clique) */}
@@ -273,7 +286,6 @@ export default function LeadsListPage() {
         </div>
       )}
 
-      {modoSelecao && nSel === 0 && <p className="mb-3 text-[13px] text-slate-500">Toque nos cards para selecionar.</p>}
 
       {lista.length === 0 ? (
         <div className="rounded-3xl border border-slate-200/70 bg-white dark:border-slate-800 dark:bg-slate-900">
@@ -307,23 +319,32 @@ export default function LeadsListPage() {
               focado={i === foco}
               modoSelecao={modoSelecao}
               onSelecionar={alternar}
+              onSegurar={segurar}
               onFocar={() => setFoco(i)}
             />
           ))}
         </div>
       )}
 
-      <p className="mt-6 hidden text-center text-xs text-slate-400 md:block">
-        Teclado: <kbd className="font-sans font-semibold">[</kbd>/<kbd className="font-sans font-semibold">]</kbd> trocar etapa · <kbd className="font-sans font-semibold">J</kbd>/<kbd className="font-sans font-semibold">K</kbd> navegar · <kbd className="font-sans font-semibold">L</kbd> ligação ·{' '}
-        <kbd className="font-sans font-semibold">W</kbd> WhatsApp · <kbd className="font-sans font-semibold">X</kbd> selecionar
+      <p className="mt-6 text-center text-xs text-slate-400 lg:hidden">Segure um card para selecionar vários.</p>
+      <p className="mt-6 hidden text-center text-xs text-slate-400 lg:block">
+        Segure um card (ou aperte <kbd className="font-sans font-semibold">X</kbd>) para selecionar vários · Teclado: <kbd className="font-sans font-semibold">[</kbd>/<kbd className="font-sans font-semibold">]</kbd> trocar etapa · <kbd className="font-sans font-semibold">J</kbd>/<kbd className="font-sans font-semibold">K</kbd> navegar · <kbd className="font-sans font-semibold">L</kbd> ligação ·{' '}
+        <kbd className="font-sans font-semibold">W</kbd> WhatsApp
       </p>
 
       {/* Barra de ações em massa */}
       {nSel > 0 && (
         <div className="fixed inset-x-3 bottom-[calc(6.25rem+env(safe-area-inset-bottom,0px))] z-30 mx-auto flex max-w-2xl animate-slide-up flex-wrap items-center gap-2 rounded-[22px] bg-slate-900 p-2 pl-4 text-sm text-white shadow-pop dark:bg-slate-800 lg:bottom-6">
-          <span className="font-semibold">
+          <span className="num font-semibold">
             {nSel} selecionado{nSel > 1 && 's'}
           </span>
+          <button
+            type="button"
+            onClick={() => setSelecionados(nSel === lista.length ? new Set() : new Set(lista.map((l) => l.id)))}
+            className="h-9 rounded-full px-3 text-[13px] font-medium text-white/80 hover:bg-white/10 hover:text-white"
+          >
+            {nSel === lista.length ? 'Desmarcar todos' : 'Selecionar todos'}
+          </button>
           <select
             aria-label="Mover selecionados para etapa"
             className={selectEscuro}

@@ -14,6 +14,7 @@ import { Button } from '../ui/Button';
 import { inputBase } from '../ui/Field';
 import { Modal } from '../ui/Modal';
 import { EtapaBadge } from '../leads/Badges';
+import { Calendario, Horarios } from './Seletores';
 import { LastContactBadge } from '../leads/LastContactBadge';
 
 export type TipoAgendavel = Extract<TipoTarefa, 'reuniao' | 'retorno' | 'tarefa'>;
@@ -23,7 +24,6 @@ export interface AgendamentoPrefill {
 }
 
 const TIPOS: TipoAgendavel[] = ['reuniao', 'retorno', 'tarefa'];
-const HORARIOS = ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00'];
 const FORMATO_ICONE: Record<FormatoReuniao, typeof Video> = { video: Video, presencial: MapPin, telefone: Phone };
 
 function proximaSegunda(): Date {
@@ -40,6 +40,72 @@ function atalhosData() {
     { label: 'Em 2 dias', valor: toInputDate(addDays(hoje, 2).toISOString()) },
     { label: 'Segunda', valor: toInputDate(proximaSegunda().toISOString()) },
   ];
+}
+
+/** "2026-11-04" → "Qua, 04 de nov." */
+function dataCurta(v: string): string {
+  const [a, m, d] = v.split('-').map(Number);
+  const s = new Date(a, m - 1, d).toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' });
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+/** "2026-11-04" → "Qua., 04/11" */
+function dataMinima(v: string): string {
+  const [a, m, d] = v.split('-').map(Number);
+  const dia = new Date(a, m - 1, d).toLocaleDateString('pt-BR', { weekday: 'short' });
+  return `${dia.charAt(0).toUpperCase()}${dia.slice(1)} ${String(d).padStart(2, '0')}/${String(m).padStart(2, '0')}`;
+}
+
+/** Botão grande que mostra o valor escolhido e abre o seletor. */
+function BotaoCampo({
+  rotulo,
+  icone,
+  valor,
+  valorCurto,
+  aberto,
+  onClick,
+  autoFoco,
+}: {
+  rotulo: string;
+  icone: ReactNode;
+  valor: string;
+  /** Versão curta para telas estreitas */
+  valorCurto?: string;
+  aberto: boolean;
+  onClick: () => void;
+  autoFoco?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-expanded={aberto}
+      data-autofocus={autoFoco ? true : undefined}
+      className={cn(
+        'flex h-[3.75rem] min-w-0 items-center gap-3 rounded-2xl border px-3.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/20',
+        aberto
+          ? 'border-brand-500 bg-brand-50/60 dark:bg-brand-500/10'
+          : 'border-slate-200 bg-white hover:border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-slate-600',
+      )}
+    >
+      <span className={cn('flex h-9 w-9 shrink-0 items-center justify-center rounded-xl', aberto ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300')}>
+        {icone}
+      </span>
+      <span className="min-w-0">
+        <span className="block text-[11px] font-medium text-slate-500 dark:text-slate-400">{rotulo}</span>
+        <span className="num block truncate text-[15px] font-semibold text-slate-900 dark:text-white">
+          {valorCurto ? (
+            <>
+              <span className="sm:hidden">{valorCurto}</span>
+              <span className="hidden sm:inline">{valor}</span>
+            </>
+          ) : (
+            valor
+          )}
+        </span>
+      </span>
+    </button>
+  );
 }
 
 function dataPorExtenso(iso: string): string {
@@ -99,6 +165,7 @@ export function ScheduleModal({ prefill, onFechar }: { prefill: AgendamentoPrefi
   const [descricao, setDescricao] = useState('');
   const [moverParaReuniao, setMoverParaReuniao] = useState(true);
   const [erro, setErro] = useState('');
+  const [seletor, setSeletor] = useState<'data' | 'hora' | null>(null);
   const buscaRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -116,6 +183,7 @@ export function ScheduleModal({ prefill, onFechar }: { prefill: AgendamentoPrefi
     setDescricao('');
     setMoverParaReuniao(true);
     setErro('');
+    setSeletor(null);
     if (!prefill.leadId) requestAnimationFrame(() => buscaRef.current?.focus());
   }, [prefill]);
 
@@ -204,9 +272,6 @@ export function ScheduleModal({ prefill, onFechar }: { prefill: AgendamentoPrefi
     });
     onFechar();
   };
-
-  const datas = atalhosData();
-  const dataEhAtalho = datas.some((d) => d.valor === data);
 
   return (
     <Modal
@@ -351,53 +416,49 @@ export function ScheduleModal({ prefill, onFechar }: { prefill: AgendamentoPrefi
           </Secao>
         )}
 
-        {/* Data */}
-        <Secao titulo="Data" icone={<CalendarDays className="h-3.5 w-3.5" />}>
-          <div className="flex flex-wrap items-center gap-2">
-            {datas.map((d) => (
-              <Opcao key={d.label} ativo={data === d.valor} onClick={() => setData(d.valor)}>
-                {d.label}
-              </Opcao>
-            ))}
-            <input
-              type="date"
-              value={data}
-              min={datas[0].valor}
-              onChange={(e) => setData(e.target.value)}
-              aria-label="Outra data"
-              className={cn(
-                'h-9 rounded-full border px-3 text-[13px] font-medium outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15 dark:bg-slate-900',
-                !dataEhAtalho && data ? 'border-slate-900 dark:border-white' : 'border-slate-200 text-slate-600 dark:border-slate-700 dark:text-slate-300',
-              )}
+        {/* Data e horário: um botão para cada, que abre o seletor logo abaixo */}
+        <div>
+          <div className="grid grid-cols-[1.4fr_1fr] gap-2">
+            <BotaoCampo
+              rotulo="Data"
+              icone={<CalendarDays className="h-[18px] w-[18px]" />}
+              valor={data ? dataCurta(data) : 'Escolher data'}
+              valorCurto={data ? dataMinima(data) : 'Escolher'}
+              aberto={seletor === 'data'}
+              onClick={() => setSeletor((v) => (v === 'data' ? null : 'data'))}
+              autoFoco={!!prefill?.leadId}
+            />
+            <BotaoCampo
+              rotulo="Horário"
+              icone={<Clock className="h-[18px] w-[18px]" />}
+              valor={hora || (tipo === 'reuniao' ? 'Escolher' : 'Dia todo')}
+              aberto={seletor === 'hora'}
+              onClick={() => setSeletor((v) => (v === 'hora' ? null : 'hora'))}
             />
           </div>
-          {data && <p className="mt-2 text-xs text-slate-500 first-letter:uppercase">{dataPorExtenso(fromInputDate(data)!)}</p>}
-        </Secao>
-
-        {/* Horário */}
-        <Secao titulo="Horário" icone={<Clock className="h-3.5 w-3.5" />}>
-          <div className="no-scrollbar -mx-6 flex gap-2 overflow-x-auto px-6 sm:mx-0 sm:flex-wrap sm:px-0">
-            {tipo !== 'reuniao' && (
-              <Opcao ativo={!hora} onClick={() => setHora('')}>
-                Dia todo
-              </Opcao>
-            )}
-            {HORARIOS.map((h) => (
-              <Opcao key={h} ativo={hora === h} onClick={() => setHora(h)} className="num">
-                {h}
-              </Opcao>
-            ))}
-            <input
-              type="time"
-              value={hora}
-              onChange={(e) => setHora(e.target.value)}
-              aria-label="Outro horário"
-              className={cn(
-                'num h-9 shrink-0 rounded-full border px-3 text-[13px] font-medium outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15 dark:bg-slate-900',
-                hora && !HORARIOS.includes(hora) ? 'border-slate-900 dark:border-white' : 'border-slate-200 text-slate-600 dark:border-slate-700 dark:text-slate-300',
-              )}
-            />
-          </div>
+          {seletor === 'data' && (
+            <div className="mt-2 animate-fade-in">
+              <Calendario
+                valor={data}
+                onEscolher={(v) => {
+                  setData(v);
+                  setSeletor('hora'); // próximo passo natural: o horário
+                }}
+              />
+            </div>
+          )}
+          {seletor === 'hora' && (
+            <div className="mt-2 animate-fade-in">
+              <Horarios
+                valor={hora}
+                permitirDiaTodo={tipo !== 'reuniao'}
+                onEscolher={(v) => {
+                  setHora(v);
+                  setSeletor(null);
+                }}
+              />
+            </div>
+          )}
           {doDia.length > 0 && (
             <div className={cn('mt-3 rounded-2xl px-3.5 py-2.5 text-xs', conflito ? 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300' : 'bg-slate-50 text-slate-500 dark:bg-slate-800/60 dark:text-slate-400')}>
               <p className="mb-1 font-semibold">{conflito ? 'Você já tem um compromisso nesse horário' : 'Já marcado neste dia'}</p>
@@ -411,7 +472,7 @@ export function ScheduleModal({ prefill, onFechar }: { prefill: AgendamentoPrefi
               </ul>
             </div>
           )}
-        </Secao>
+        </div>
 
         {tipo === 'reuniao' && formato !== 'telefone' && (
           <Secao titulo={formato === 'video' ? 'Link da chamada (opcional)' : 'Local (opcional)'} icone={formato === 'video' ? <Link2 className="h-3.5 w-3.5" /> : <MapPin className="h-3.5 w-3.5" />}>

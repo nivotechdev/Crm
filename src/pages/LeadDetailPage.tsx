@@ -1,16 +1,15 @@
 import { useMemo, useRef, useState, type ReactNode } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, CalendarPlus, Check, ChevronDown, ClipboardEdit, Phone, Send, Trash2 } from 'lucide-react';
+import { ArrowLeft, CalendarClock, CalendarPlus, Check, MessageSquareText, ClipboardEdit, Phone, Send, Trash2 } from 'lucide-react';
 import type { Lead, Temperatura } from '../types';
 import { useData } from '../store/DataContext';
 import { useAcoes } from '../store/AcoesContext';
 import { useToast } from '../store/ToastContext';
 import { useNow } from '../store/NowContext';
 import { useHotkeys } from '../hooks/useHotkeys';
-import { formatData, formatHora, fromInputDate, tempoRelativoAgenda } from '../lib/dates';
+import { formatData, formatHora, tempoRelativoAgenda } from '../lib/dates';
 import { formatTelefone } from '../lib/format';
 import { FORMATOS_REUNIAO, MOTIVOS_PERDA, OBJETIVOS, SIM_NAO_TALVEZ, TEMPERATURAS, URGENCIAS, opcoes } from '../lib/labels';
-import { ATALHOS_AGENDA, dataDaquiA } from '../lib/agendamento';
 import { linkTelefone, preencherModelo } from '../lib/whatsapp';
 import { cn } from '../lib/cn';
 import { Avatar } from '../components/ui/Avatar';
@@ -22,9 +21,13 @@ import { Segmented } from '../components/ui/Segmented';
 import { WhatsAppIcon } from '../components/ui/WhatsAppIcon';
 import { LastContactBadge } from '../components/leads/LastContactBadge';
 import { Timeline } from '../components/leads/Timeline';
-import { Simulator } from '../components/leads/Simulator';
 
-type Aba = 'historico' | 'dados' | 'simulacao';
+type Aba = 'historico' | 'dados';
+
+const acaoBase =
+  'flex h-[4.25rem] min-w-0 flex-col items-center justify-center gap-1 rounded-2xl px-0.5 text-[11.5px] font-semibold tracking-tight sm:text-xs sm:tracking-normal transition-all active:scale-[.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500';
+const acaoNeutra =
+  'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800';
 
 export default function LeadDetailPage() {
   const { id } = useParams();
@@ -42,7 +45,7 @@ export default function LeadDetailPage() {
 }
 
 function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<ReturnType<typeof useData>, 'atividades' | 'tarefas' | 'config'>) {
-  const { atualizarLead, adicionarNota, alternarTarefa, agendarRetorno, excluirLeads, leads } = useData();
+  const { atualizarLead, adicionarNota, alternarTarefa, excluirLeads, leads } = useData();
   const { contatoRapido, pedirMoverEtapa, confirmar, abrirAgendamento } = useAcoes();
   const toast = useToast();
   const now = useNow();
@@ -51,7 +54,6 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
   const [nota, setNota] = useState('');
   const [menuWpp, setMenuWpp] = useState(false);
   const [menuRegistrar, setMenuRegistrar] = useState(false);
-  const [dataCustom, setDataCustom] = useState(false);
   const notaRef = useRef<HTMLTextAreaElement>(null);
 
   const historico = useMemo(
@@ -81,12 +83,6 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
     toast('Anotação adicionada');
   };
 
-  const agendar = async (iso: string) => {
-    await agendarRetorno(lead.id, iso);
-    setDataCustom(false);
-    toast(`Retorno agendado: ${formatData(iso, { ano: false })}`);
-  };
-
   const abertas = config.etapas.filter((e) => e.tipo === 'aberta');
   const finais = config.etapas.filter((e) => e.tipo !== 'aberta');
   const idxAtual = abertas.findIndex((e) => e.id === lead.etapaId);
@@ -99,7 +95,7 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
       </button>
 
       {/* Cabeçalho */}
-      <Card className="mb-4 overflow-visible p-5 sm:p-6">
+      <Card className="mb-4 overflow-visible p-4 sm:p-6">
         <div className="flex items-start gap-3">
           <Avatar nome={lead.nome} className="h-12 w-12 text-base" />
           <div className="min-w-0 flex-1">
@@ -131,39 +127,45 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
           </div>
         </div>
 
-        {/* Botões grandes */}
-        <div className="mt-4 grid grid-cols-3 gap-2">
+        {/* Ações rápidas: 4 colunas iguais, ícone em cima e nome embaixo */}
+        <div className="mt-5 grid grid-cols-4 gap-1.5 sm:gap-2">
           <a
             href={linkTelefone(lead.telefone)}
             onClick={() => contatoRapido(lead, 'ligacao')}
-            className="flex h-12 items-center justify-center gap-2 rounded-full bg-brand-600 text-sm font-semibold text-white transition-colors hover:bg-brand-700 active:scale-[.98]"
+            className={cn(acaoBase, 'bg-brand-600 text-white hover:bg-brand-700')}
           >
-            <Phone className="h-5 w-5" /> Ligar
+            <Phone className="h-5 w-5" />
+            <span className="max-w-full truncate">Ligar</span>
           </a>
-          <div className="relative flex">
+          <button type="button" onClick={() => contatoRapido(lead, 'whatsapp')} className={cn(acaoBase, 'bg-[#1DA851] text-white hover:bg-[#178a45]')}>
+            <WhatsAppIcon className="h-5 w-5" />
+            <span className="max-w-full truncate">WhatsApp</span>
+          </button>
+          <div className="relative">
             <button
-              onClick={() => contatoRapido(lead, 'whatsapp')}
-              className="flex h-12 flex-1 items-center justify-center gap-2 rounded-l-full bg-[#1DA851] pl-2 text-sm font-semibold text-white transition-colors hover:bg-[#178a45] active:scale-[.98]"
-            >
-              <WhatsAppIcon className="h-5 w-5" /> WhatsApp
-            </button>
-            <button
-              aria-label="Escolher modelo de mensagem"
+              type="button"
+              aria-haspopup="menu"
               aria-expanded={menuWpp}
-              onClick={() => setMenuWpp((m) => !m)}
-              className="flex h-12 w-10 items-center justify-center rounded-r-full border-l border-white/25 bg-[#1DA851] pr-1 text-white hover:bg-[#178a45]"
+              onClick={() => {
+                setMenuRegistrar(false);
+                setMenuWpp((m) => !m);
+              }}
+              className={cn(acaoBase, acaoNeutra, 'w-full')}
             >
-              <ChevronDown className="h-4 w-4" />
+              <MessageSquareText className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+              <span className="max-w-full truncate">Modelos</span>
             </button>
             {menuWpp && (
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setMenuWpp(false)} />
-                <div className="absolute left-0 right-0 top-full z-20 mt-1 min-w-[240px] rounded-2xl border border-slate-200/80 bg-white p-1.5 shadow-pop dark:border-slate-700 dark:bg-slate-800 sm:left-auto">
-                  <p className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-slate-400">Abrir com modelo</p>
+                <div role="menu" className="absolute left-1/2 top-full z-20 mt-2 w-64 -translate-x-1/2 rounded-2xl border border-slate-200/80 bg-white p-1.5 shadow-pop dark:border-slate-700 dark:bg-slate-800">
+                  <p className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-400">Abrir WhatsApp com</p>
                   {config.modelos.map((m) => (
                     <button
                       key={m.id}
-                      className="block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-slate-100 dark:hover:bg-slate-700"
+                      type="button"
+                      role="menuitem"
+                      className="block w-full rounded-xl px-3 py-2.5 text-left text-sm hover:bg-slate-100 dark:hover:bg-slate-700"
                       onClick={() => {
                         setMenuWpp(false);
                         contatoRapido(lead, 'whatsapp', { texto: preencherModelo(m.texto, lead, config) });
@@ -172,8 +174,8 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
                       {m.nome}
                     </button>
                   ))}
-                  <Link to="/configuracoes#modelos" className="block rounded-lg px-3 py-2 text-xs text-brand-600 hover:bg-slate-100 dark:text-brand-400 dark:hover:bg-slate-700">
-                    Gerenciar modelos…
+                  <Link to="/configuracoes#modelos" className="block rounded-xl px-3 py-2 text-xs font-medium text-brand-700 hover:bg-slate-100 dark:text-brand-300 dark:hover:bg-slate-700">
+                    Gerenciar modelos
                   </Link>
                 </div>
               </>
@@ -181,19 +183,27 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
           </div>
           <div className="relative">
             <button
-              onClick={() => setMenuRegistrar((m) => !m)}
+              type="button"
+              aria-haspopup="menu"
               aria-expanded={menuRegistrar}
-              className="flex h-12 w-full items-center justify-center gap-2 rounded-full border border-slate-200 bg-white text-sm font-semibold text-slate-800 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
+              onClick={() => {
+                setMenuWpp(false);
+                setMenuRegistrar((m) => !m);
+              }}
+              className={cn(acaoBase, acaoNeutra, 'w-full')}
             >
-              <ClipboardEdit className="h-5 w-5" /> <span className="hidden sm:inline">Registrar contato</span>
-              <span className="sm:hidden">Registrar</span>
+              <ClipboardEdit className="h-5 w-5" />
+              <span className="max-w-full truncate">Registrar</span>
             </button>
             {menuRegistrar && (
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setMenuRegistrar(false)} />
-                <div className="absolute right-0 top-full z-20 mt-1 w-56 rounded-2xl border border-slate-200/80 bg-white p-1.5 shadow-pop dark:border-slate-700 dark:bg-slate-800">
+                <div role="menu" className="absolute right-0 top-full z-20 mt-2 w-60 rounded-2xl border border-slate-200/80 bg-white p-1.5 shadow-pop dark:border-slate-700 dark:bg-slate-800">
+                  <p className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-400">Registrar sem abrir</p>
                   <button
-                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm hover:bg-slate-100 dark:hover:bg-slate-700"
+                    type="button"
+                    role="menuitem"
+                    className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-sm hover:bg-slate-100 dark:hover:bg-slate-700"
                     onClick={() => {
                       setMenuRegistrar(false);
                       contatoRapido(lead, 'ligacao');
@@ -202,13 +212,15 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
                     <Phone className="h-4 w-4 text-brand-600" /> Liguei
                   </button>
                   <button
-                    className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm hover:bg-slate-100 dark:hover:bg-slate-700"
+                    type="button"
+                    role="menuitem"
+                    className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-sm hover:bg-slate-100 dark:hover:bg-slate-700"
                     onClick={() => {
                       setMenuRegistrar(false);
                       contatoRapido(lead, 'whatsapp', { abrir: false });
                     }}
                   >
-                    <WhatsAppIcon className="h-4 w-4 text-emerald-600" /> Mandei WhatsApp (sem abrir)
+                    <WhatsAppIcon className="h-4 w-4 text-emerald-600" /> Mandei WhatsApp
                   </button>
                 </div>
               </>
@@ -307,30 +319,13 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
           ) : (
             <p className="mb-3 text-sm text-slate-500">Nada agendado com este lead.</p>
           )}
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="mr-1 text-xs text-slate-500">Agendar retorno:</span>
-            {ATALHOS_AGENDA.map((a) => (
-              <Button key={a.dias} tamanho="sm" onClick={() => agendar(dataDaquiA(a.dias))}>
-                {a.label}
-              </Button>
-            ))}
-            {dataCustom ? (
-              <input
-                type="date"
-                autoFocus
-                className="h-8 rounded-full border border-brand-500 px-3 text-xs outline-none ring-4 ring-brand-500/15 dark:bg-slate-800"
-                onChange={(e) => {
-                  const iso = fromInputDate(e.target.value);
-                  if (iso) agendar(iso);
-                }}
-                onBlur={() => setDataCustom(false)}
-              />
-            ) : (
-              <Button tamanho="sm" onClick={() => setDataCustom(true)}>
-                Data…
-              </Button>
-            )}
-          </div>
+          <Button
+            tamanho="sm"
+            icone={<CalendarClock className="h-4 w-4" />}
+            onClick={() => abrirAgendamento({ leadId: lead.id, tipo: 'retorno' })}
+          >
+            Agendar retorno
+          </Button>
         </div>
       </Card>
 
@@ -341,7 +336,6 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
         opcoes={[
           { value: 'historico', label: 'Histórico', contador: historico.length },
           { value: 'dados', label: 'Dados' },
-          { value: 'simulacao', label: 'Simulação' },
         ]}
       />
 
@@ -435,12 +429,6 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
             </div>
           </Card>
 
-          <Card className={cn(aba !== 'simulacao' && 'hidden md:block')}>
-            <CardHeader titulo="Simulação rápida" subtitulo="Informe os dados da administradora" />
-            <div className="px-5 pb-5">
-              <Simulator lead={lead} />
-            </div>
-          </Card>
         </div>
 
         {/* Histórico */}
