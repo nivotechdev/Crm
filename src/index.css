@@ -5,11 +5,14 @@
 :root {
   --app-bg: #FAFAF9;
   --app-fg: #1C1916;
+  /* Superfície (canais RGB) usada no vidro da navegação */
+  --c-surface: 255 255 255;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     --app-bg: #110F0D;
     --app-fg: #F4F3F1;
+    --c-surface: 28 25 22;
     color-scheme: dark;
   }
 }
@@ -17,11 +20,13 @@
 html.dark:root {
   --app-bg: #110F0D;
   --app-fg: #F4F3F1;
+  --c-surface: 28 25 22;
   color-scheme: dark;
 }
 html.light:root {
   --app-bg: #FAFAF9;
   --app-fg: #1C1916;
+  --c-surface: 255 255 255;
   color-scheme: light;
 }
 
@@ -55,6 +60,14 @@ html.light:root {
 }
 
 @layer components {
+  /* Vidro da pílula do celular (= ilha do topo rolada) */
+  .app-glass {
+    background: rgb(var(--c-surface) / 0.78);
+    border: 1px solid rgb(var(--c-surface) / 0.7);
+    -webkit-backdrop-filter: blur(18px) saturate(1.8);
+    backdrop-filter: blur(18px) saturate(1.8);
+    box-shadow: 0 0 0 1px rgba(16, 20, 24, 0.07), 0 12px 36px rgba(16, 20, 24, 0.14);
+  }
   .num {
     font-variant-numeric: tabular-nums;
   }

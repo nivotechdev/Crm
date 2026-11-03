@@ -6,7 +6,7 @@ import { cn } from '../../lib/cn';
 import type { Role } from '../nav/navItems';
 import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
-import { BottomNav } from './BottomNav';
+import { AppNav } from '../nav/AppNav';
 import { CommandPalette } from './CommandPalette';
 import { ShortcutsHelp } from './ShortcutsHelp';
 
@@ -75,7 +75,7 @@ export function AppShell() {
         <Plus className="h-6 w-6" strokeWidth={2.5} />
       </button>
       )}
-      <BottomNav />
+      <AppNav role={ROLE} active={abaAtiva} showMobilePill={naRaizDeAba} />
       <CommandPalette />
       <ShortcutsHelp />
     </div>
