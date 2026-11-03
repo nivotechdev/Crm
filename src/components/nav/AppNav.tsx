@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { cn } from '../../lib/cn';
 import { NAV_ICONS } from './navIcons';
 import { NAV_ITEMS, type Role } from './navItems';
+import { TopBar } from './TopBar';
 
 interface Props {
   role: Role;
@@ -53,6 +54,7 @@ export function AppNav({ role, active, showMobilePill = true }: Props) {
           })}
         </nav>
       )}
+      <TopBar role={role} items={items} active={active} />
     </div>
   );
 }

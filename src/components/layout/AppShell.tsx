@@ -4,8 +4,6 @@ import { useAcoes } from '../../store/AcoesContext';
 import { useHotkeys } from '../../hooks/useHotkeys';
 import { cn } from '../../lib/cn';
 import type { Role } from '../nav/navItems';
-import { Sidebar } from './Sidebar';
-import { Topbar } from './Topbar';
 import { AppNav } from '../nav/AppNav';
 import { CommandPalette } from './CommandPalette';
 import { ShortcutsHelp } from './ShortcutsHelp';
@@ -55,17 +53,14 @@ export function AppShell() {
   });
 
   return (
-    <div className="flex min-h-dvh overflow-x-clip bg-[color:var(--app-bg)] text-slate-900 dark:text-slate-100" data-aba-ativa={abaAtiva ?? undefined}>
+    <div className="flex min-h-dvh flex-col overflow-x-clip bg-[color:var(--app-bg)] text-slate-900 dark:text-slate-100" data-aba-ativa={abaAtiva ?? undefined}>
       <a href="#conteudo" className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-white focus:px-3 focus:py-2">
         Pular para o conteúdo
       </a>
-      <Sidebar />
-      <div className="flex min-w-0 flex-1 flex-col">
-        <Topbar />
-        <main id="conteudo" className={cn('min-w-0 flex-1', naRaizDeAba ? 'pb-28 lg:pb-16' : 'pb-8 lg:pb-16')}>
-          <Outlet />
-        </main>
-      </div>
+      <AppNav role={ROLE} active={abaAtiva} showMobilePill={naRaizDeAba} />
+      <main id="conteudo" className={cn('min-w-0 flex-1', naRaizDeAba ? 'pb-28 lg:pb-16' : 'pb-8 lg:pb-16')}>
+        <Outlet />
+      </main>
       {naRaizDeAba && (
       <button
         onClick={() => abrirNovoLead()}
@@ -75,7 +70,6 @@ export function AppShell() {
         <Plus className="h-6 w-6" strokeWidth={2.5} />
       </button>
       )}
-      <AppNav role={ROLE} active={abaAtiva} showMobilePill={naRaizDeAba} />
       <CommandPalette />
       <ShortcutsHelp />
     </div>
