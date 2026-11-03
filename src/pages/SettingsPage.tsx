@@ -82,7 +82,7 @@ export default function SettingsPage() {
         titulo="Configurações"
         subtitulo="Meta, funil, mensagens e aparência"
         acoes={
-          <Link to="/" className="hidden sm:block">
+          <Link to="/">
             <Button icone={<ArrowLeft className="h-4 w-4" />}>Início</Button>
           </Link>
         }
@@ -292,7 +292,7 @@ export default function SettingsPage() {
       </div>
 
       {sujo && (
-        <div className="fixed inset-x-3 bottom-[calc(5.25rem+env(safe-area-inset-bottom))] z-30 mx-auto flex max-w-xl animate-slide-up items-center gap-3 rounded-[22px] bg-slate-900 p-2 pl-5 text-sm text-white shadow-pop dark:bg-slate-800 md:bottom-6 md:left-60">
+        <div className="fixed inset-x-3 bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] z-30 mx-auto flex max-w-xl animate-slide-up items-center gap-3 rounded-[22px] bg-slate-900 p-2 pl-5 text-sm text-white shadow-pop dark:bg-slate-800 lg:bottom-6">
           <span className="flex-1">Você tem alterações não salvas</span>
           <Button variante="fantasma" className="text-slate-300 hover:bg-white/10 hover:text-white" onClick={() => setCfg(data.config)}>
             Descartar

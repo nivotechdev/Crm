@@ -77,7 +77,7 @@ export function ContactOutcomeSheet({ contato, onFechar }: { contato: ContatoEmA
     <div
       role="region"
       aria-label="Resultado do contato"
-      className="fixed inset-x-2 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-40 animate-slide-up rounded-[26px] border border-slate-200/80 bg-white p-5 shadow-pop dark:border-slate-700 dark:bg-slate-900 md:inset-x-auto md:bottom-6 md:right-6 md:w-[400px]"
+      className="fixed inset-x-2 bottom-[calc(6.25rem+env(safe-area-inset-bottom,0px))] z-40 animate-slide-up rounded-[26px] border border-slate-200/80 bg-white p-5 shadow-pop dark:border-slate-700 dark:bg-slate-900 lg:inset-x-auto lg:bottom-6 lg:right-6 lg:w-[400px]"
     >
       <div className="mb-3 flex items-start gap-3">
         <div

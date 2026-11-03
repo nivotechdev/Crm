@@ -75,10 +75,16 @@ export function TopBar({ role, items, active }: { role: Role; items: NavItem[]; 
     barra.dataset.montado = '1';
     posicionar(!primeiraVez);
 
-    const aoRedimensionar = () => posicionar(false);
+    // Recalcula sem animar só se a medida mudou (ex.: fonte carregou, janela mudou)
+    const recalcular = () => {
+      const aba = active ? nav.querySelector<HTMLElement>(`[data-tab-id="${active}"]`) : null;
+      if (aba && ultimaPosicao && aba.offsetLeft === ultimaPosicao.x && aba.offsetWidth === ultimaPosicao.w) return;
+      posicionar(false);
+    };
+    const aoRedimensionar = () => recalcular();
     window.addEventListener('resize', aoRedimensionar);
     let vivo = true;
-    document.fonts?.ready.then(() => vivo && posicionar(false));
+    document.fonts?.ready.then(() => vivo && recalcular());
     return () => {
       vivo = false;
       window.removeEventListener('resize', aoRedimensionar);

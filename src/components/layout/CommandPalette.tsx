@@ -5,7 +5,9 @@ import { useData } from '../../store/DataContext';
 import { useAcoes } from '../../store/AcoesContext';
 import { formatTelefone, normalizarBusca, somenteDigitos } from '../../lib/format';
 import { cn } from '../../lib/cn';
-import { NAV, NAV_CONFIG } from './nav';
+import { NAV_ITEMS } from '../nav/navItems';
+import { NAV_ICONS } from '../nav/navIcons';
+import { BarChart3 } from 'lucide-react';
 import { Avatar } from '../ui/Avatar';
 import { LastContactBadge } from '../leads/LastContactBadge';
 import { EtapaBadge } from '../leads/Badges';
@@ -63,12 +65,22 @@ export function CommandPalette() {
         run: () => abrirNovoLead(dig.length >= 10 ? { telefone: dig } : !dig && termo ? { nome: q.trim() } : undefined),
       },
       { tipo: 'cmd' as const, label: 'Agendar reunião', icone: CalendarPlus, run: () => abrirAgendamento({ tipo: 'reuniao' }) },
-      ...[...NAV, NAV_CONFIG].filter((n) => !termo || normalizarBusca(n.label).includes(termo)).map((n) => ({
-        tipo: 'cmd' as const,
-        label: `Ir para ${n.label}`,
-        icone: n.icone,
-        run: () => navigate(n.to),
-      })),
+      ...[
+        ...NAV_ITEMS.vendedor.map((n) => ({ label: n.label, icone: NAV_ICONS[n.icon], to: n.path })),
+        { label: 'Relatórios', icone: BarChart3, to: '/' },
+        { label: 'Clientes', icone: NAV_ICONS.clientes, to: '/clientes' },
+        { label: 'Configurações', icone: NAV_ICONS.configuracoes, to: '/configuracoes' },
+      ]
+        .filter((n) => !termo || normalizarBusca(n.label).includes(termo))
+        .map((n) => ({
+          tipo: 'cmd' as const,
+          label: `Ir para ${n.label}`,
+          icone: n.icone,
+          run: () => {
+            navigate(n.to);
+            if (n.label === 'Relatórios') setTimeout(() => document.getElementById('relatorios')?.scrollIntoView({ behavior: 'smooth' }), 120);
+          },
+        })),
     ];
     return [...ls, ...cs, ...cmds];
   }, [q, leads, clientes, navigate, abrirNovoLead, abrirAgendamento]);

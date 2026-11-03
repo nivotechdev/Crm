@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { CalendarClock, ExternalLink, Gavel, Gift, Plus, Search, Trash2, UserCheck } from 'lucide-react';
+import { ArrowLeft, CalendarClock, ExternalLink, Gavel, Gift, Plus, Search, Trash2, UserCheck } from 'lucide-react';
 import type { Cliente, StatusCliente } from '../types';
 import { useData } from '../store/DataContext';
 import { useAcoes } from '../store/AcoesContext';
@@ -94,9 +94,16 @@ export default function ClientsPage() {
         titulo="Clientes"
         subtitulo={`${clientes.length} cotas vendidas · ${formatBRLCompacto(volumeTotal)} em carteira ativa`}
         acoes={
-          <Button variante="primario" icone={<Plus className="h-4 w-4" />} onClick={() => setNovo(true)}>
-            <span className="hidden sm:inline">Novo cliente</span>
-          </Button>
+          <>
+            <Link to="/" className="lg:hidden">
+              <Button icone={<ArrowLeft className="h-4 w-4" />} aria-label="Voltar para o início">
+                <span className="hidden sm:inline">Início</span>
+              </Button>
+            </Link>
+            <Button variante="primario" icone={<Plus className="h-4 w-4" />} onClick={() => setNovo(true)}>
+              <span className="hidden sm:inline">Novo cliente</span>
+            </Button>
+          </>
         }
       />
 

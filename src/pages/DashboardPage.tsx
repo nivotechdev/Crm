@@ -17,6 +17,7 @@ import { TaskItem } from '../components/agenda/TaskItem';
 import { ContactStripe, LastContactBadge } from '../components/leads/LastContactBadge';
 import { QuickContactButtons } from '../components/leads/QuickContactButtons';
 import { MetaModal } from '../components/dashboard/MetaModal';
+import { RelatoriosSecao } from '../components/dashboard/RelatoriosSecao';
 import { Button } from '../components/ui/Button';
 import { useAcoes } from '../store/AcoesContext';
 
@@ -230,6 +231,7 @@ export default function DashboardPage() {
           </div>
         </Card>
       </div>
+      <RelatoriosSecao />
       <MetaModal aberto={editarMeta} onFechar={() => setEditarMeta(false)} />
     </div>
   );

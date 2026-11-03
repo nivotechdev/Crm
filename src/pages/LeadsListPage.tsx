@@ -18,6 +18,7 @@ import { Select, inputBase } from '../components/ui/Field';
 import { EmptyState } from '../components/ui/EmptyState';
 import { LeadCard } from '../components/leads/LeadListItem';
 import { PageHeader } from '../components/layout/PageHeader';
+import { DailyCounter } from '../components/layout/DailyCounter';
 import { StageSwitcher, type ResumoEtapa } from '../components/leads/StageSwitcher';
 import { formatBRLCompacto } from '../lib/format';
 
@@ -183,6 +184,15 @@ export default function LeadsListPage() {
         }
       />
 
+      <div className="mb-4 flex justify-start lg:mb-5">
+        <div className="lg:hidden">
+          <DailyCounter compacto />
+        </div>
+        <div className="hidden lg:block">
+          <DailyCounter />
+        </div>
+      </div>
+
       <StageSwitcher atual={etapa} resumo={resumo} onChange={setEtapa} />
 
       {/* Busca + controles */}
@@ -310,7 +320,7 @@ export default function LeadsListPage() {
 
       {/* Barra de ações em massa */}
       {nSel > 0 && (
-        <div className="fixed inset-x-3 bottom-[calc(5.25rem+env(safe-area-inset-bottom))] z-30 mx-auto flex max-w-2xl animate-slide-up flex-wrap items-center gap-2 rounded-[22px] bg-slate-900 p-2 pl-4 text-sm text-white shadow-pop dark:bg-slate-800 md:bottom-6 md:left-60">
+        <div className="fixed inset-x-3 bottom-[calc(6.25rem+env(safe-area-inset-bottom,0px))] z-30 mx-auto flex max-w-2xl animate-slide-up flex-wrap items-center gap-2 rounded-[22px] bg-slate-900 p-2 pl-4 text-sm text-white shadow-pop dark:bg-slate-800 lg:bottom-6">
           <span className="font-semibold">
             {nSel} selecionado{nSel > 1 && 's'}
           </span>

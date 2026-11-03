@@ -48,7 +48,10 @@ export function AppShell() {
     },
     'g a': () => navigate('/agenda'),
     'g c': () => navigate('/clientes'),
-    'g r': () => navigate('/relatorios'),
+    'g r': () => {
+      navigate('/');
+      setTimeout(() => document.getElementById('relatorios')?.scrollIntoView({ behavior: 'smooth' }), 120);
+    },
     'g s': () => navigate('/configuracoes'),
   });
 

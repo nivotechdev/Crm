@@ -15,7 +15,6 @@ import LeadsListPage from './pages/LeadsListPage';
 const LeadDetailPage = lazy(() => import('./pages/LeadDetailPage'));
 const AgendaPage = lazy(() => import('./pages/AgendaPage'));
 const ClientsPage = lazy(() => import('./pages/ClientsPage'));
-const ReportsPage = lazy(() => import('./pages/ReportsPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
@@ -40,7 +39,7 @@ function Rotas() {
           <Route path="funil" element={<Navigate to="/leads" replace />} />
           <Route path="agenda" element={<AgendaPage />} />
           <Route path="clientes" element={<ClientsPage />} />
-          <Route path="relatorios" element={<ReportsPage />} />
+          <Route path="relatorios" element={<Navigate to="/" replace />} />
           <Route path="configuracoes" element={<SettingsPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>

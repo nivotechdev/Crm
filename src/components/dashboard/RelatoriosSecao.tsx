@@ -1,21 +1,21 @@
 import { useMemo, useState } from 'react';
-import { BarChart3, Filter, MapPin, ThumbsDown, Trophy } from 'lucide-react';
-import { useData } from '../store/DataContext';
-import { useNow } from '../store/NowContext';
-import { contatosPorDia, contatosPorSemana, conversaoPorEtapa, conversaoPorOrigem, motivosDePerda, vendasPorMes } from '../lib/stats';
-import { formatBRL, formatBRLCompacto } from '../lib/format';
-import { formatDataCurta } from '../lib/dates';
-import { MOTIVOS_PERDA } from '../lib/labels';
-import { cn } from '../lib/cn';
-import { Card, CardHeader } from '../components/ui/Card';
-import { Segmented } from '../components/ui/Segmented';
-import { EmptyState } from '../components/ui/EmptyState';
-import { BarrasEmpilhadas, BarrasHorizontais } from '../components/ui/Charts';
-import { PageHeader } from '../components/layout/PageHeader';
+import { BarChart3, MapPin, ThumbsDown, Trophy } from 'lucide-react';
+import { useData } from '../../store/DataContext';
+import { useNow } from '../../store/NowContext';
+import { contatosPorDia, contatosPorSemana, conversaoPorOrigem, motivosDePerda, vendasPorMes } from '../../lib/stats';
+import { formatBRL, formatBRLCompacto } from '../../lib/format';
+import { formatDataCurta } from '../../lib/dates';
+import { MOTIVOS_PERDA } from '../../lib/labels';
+import { cn } from '../../lib/cn';
+import { Card, CardHeader } from '../ui/Card';
+import { Segmented } from '../ui/Segmented';
+import { EmptyState } from '../ui/EmptyState';
+import { BarrasEmpilhadas, BarrasHorizontais } from '../ui/Charts';
 
 type Periodo = '7' | '30' | '90';
 
-export default function ReportsPage() {
+/** Relatórios exibidos como seção da tela Início. */
+export function RelatoriosSecao() {
   const { leads, atividades, clientes, config } = useData();
   const now = useNow();
   const [periodo, setPeriodo] = useState<Periodo>('30');
@@ -28,17 +28,21 @@ export default function ReportsPage() {
   const totalLig = porDia.reduce((s, d) => s + d.ligacoes, 0);
   const totalWpp = porDia.reduce((s, d) => s + d.whatsapps, 0);
   const diasUteis = porDia.filter((d) => d.data.getDay() !== 0).length || 1;
-  const conversao = useMemo(() => conversaoPorEtapa(leads, atividades, config), [leads, atividades, config]);
   const perdas = useMemo(() => motivosDePerda(leads, config), [leads, config]);
   const origens = useMemo(() => conversaoPorOrigem(leads, config), [leads, config]);
   const vendas = useMemo(() => vendasPorMes(clientes, 6, now), [clientes, now]);
   const totalPerdas = perdas.reduce((s, p) => s + p.qtd, 0);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-5 md:px-8 md:py-8">
-      <PageHeader titulo="Relatórios" subtitulo="Acompanhe seu ritmo e o que mais converte" />
+    <section id="relatorios" aria-labelledby="titulo-relatorios" className="mt-10 scroll-mt-24">
+      <div className="mb-4">
+        <h2 id="titulo-relatorios" className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+          Relatórios
+        </h2>
+        <p className="mt-0.5 text-[13px] text-slate-500 dark:text-slate-400">Seu ritmo de contatos e o que mais converte</p>
+      </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 md:gap-5 lg:grid-cols-2">
         <Card className="lg:col-span-2">
           <CardHeader
             icone={<BarChart3 className="h-4 w-4" />}
@@ -67,30 +71,6 @@ export default function ReportsPage() {
               mostrarCadaN={agrup === 'dia' && dias > 30 ? 7 : agrup === 'dia' && dias > 7 ? 3 : 1}
             />
           </div>
-        </Card>
-
-        <Card>
-          <CardHeader icone={<Filter className="h-4 w-4" />} titulo="Conversão por etapa" subtitulo="Leads que alcançaram cada etapa (pelo histórico)" />
-          <ul className="space-y-3.5 px-5 pb-5">
-            {conversao.map((c, i) => (
-              <li key={c.etapa.id}>
-                <div className="mb-0.5 flex items-center justify-between text-xs">
-                  <span className="font-medium text-slate-700 dark:text-slate-300">{c.etapa.nome}</span>
-                  <span className="tabular-nums text-slate-500">
-                    <b className="text-slate-800 dark:text-slate-100">{c.alcancaram}</b>
-                    {i > 0 && (
-                      <span className="ml-2 font-medium text-slate-400">
-                        {Math.round(c.taxa * 100)}%
-                      </span>
-                    )}
-                  </span>
-                </div>
-                <div className="h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
-                  <div className={cn('h-full rounded-full', c.etapa.tipo === 'ganho' ? 'bg-emerald-500' : 'bg-brand-500')} style={{ width: `${conversao[0].alcancaram ? (c.alcancaram / conversao[0].alcancaram) * 100 : 0}%` }} />
-                </div>
-              </li>
-            ))}
-          </ul>
         </Card>
 
         <Card>
@@ -139,7 +119,7 @@ export default function ReportsPage() {
           </div>
         </Card>
 
-        <Card>
+        <Card className="lg:col-span-2">
           <CardHeader
             icone={<Trophy className="h-4 w-4" />}
             titulo="Volume vendido por mês"
@@ -168,6 +148,6 @@ export default function ReportsPage() {
           </div>
         </Card>
       </div>
-    </div>
+    </section>
   );
 }
