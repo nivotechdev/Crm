@@ -7,7 +7,7 @@ import { addDays, formatHora, fromInputDate, startOfDay, toInputDate } from '../
 import { formatTelefone, primeiroNome } from '../../lib/format';
 import { FORMATOS_REUNIAO, TIPOS_TAREFA } from '../../lib/labels';
 import { buscaLead } from '../../lib/leadFilters';
-import { abrirWhatsApp } from '../../lib/whatsapp';
+import { linkWhatsApp } from '../../lib/whatsapp';
 import { cn } from '../../lib/cn';
 import { Avatar } from '../ui/Avatar';
 import { Button } from '../ui/Button';
@@ -17,13 +17,14 @@ import { EtapaBadge } from '../leads/Badges';
 import { Calendario, Horarios } from './Seletores';
 import { LastContactBadge } from '../leads/LastContactBadge';
 
-export type TipoAgendavel = Extract<TipoTarefa, 'reuniao' | 'retorno' | 'tarefa'>;
+/** No app só se agenda reunião ou retorno. */
+export type TipoAgendavel = Extract<TipoTarefa, 'reuniao' | 'retorno'>;
 export interface AgendamentoPrefill {
   leadId?: string;
   tipo?: TipoAgendavel;
 }
 
-const TIPOS: TipoAgendavel[] = ['reuniao', 'retorno', 'tarefa'];
+const TIPOS: TipoAgendavel[] = ['reuniao', 'retorno'];
 const FORMATO_ICONE: Record<FormatoReuniao, typeof Video> = { video: Video, presencial: MapPin, telefone: Phone };
 
 function proximaSegunda(): Date {
@@ -246,9 +247,7 @@ export function ScheduleModal({ prefill, onFechar }: { prefill: AgendamentoPrefi
           : formato === 'video'
             ? 'Reunião por videochamada'
             : 'Reunião por telefone'
-        : tipo === 'retorno'
-          ? 'Retornar contato'
-          : 'Tarefa');
+        : 'Retornar contato');
     await criarTarefa({
       titulo,
       tipo,
@@ -266,9 +265,9 @@ export function ScheduleModal({ prefill, onFechar }: { prefill: AgendamentoPrefi
           (formato === 'video' ? ` por videochamada${local.trim() ? `: ${local.trim()}` : ''}` : formato === 'presencial' ? (local.trim() ? `, em ${local.trim()}` : ', presencialmente') : ', por telefone') +
           '. Qualquer imprevisto, é só me avisar. Até lá!'
         : null;
-    toast(`${TIPOS_TAREFA[tipo]} agendad${tipo === 'tarefa' ? 'a' : tipo === 'retorno' ? 'o' : 'a'} · ${quando}`, {
+    toast(`${tipo === 'retorno' ? 'Retorno agendado' : 'Reunião agendada'} · ${quando}`, {
       duracao: msgConfirmacao ? 7000 : undefined,
-      acao: msgConfirmacao ? { label: 'Confirmar no WhatsApp', onClick: () => abrirWhatsApp(lead!.telefone, msgConfirmacao) } : undefined,
+      acao: msgConfirmacao ? { label: 'Confirmar no WhatsApp', href: linkWhatsApp(lead!.telefone, msgConfirmacao) } : undefined,
     });
     onFechar();
   };
@@ -277,7 +276,7 @@ export function ScheduleModal({ prefill, onFechar }: { prefill: AgendamentoPrefi
     <Modal
       aberto={aberto}
       onFechar={onFechar}
-      titulo={tipo === 'reuniao' ? 'Agendar reunião' : tipo === 'retorno' ? 'Agendar retorno' : 'Nova tarefa'}
+      titulo={tipo === 'reuniao' ? 'Agendar reunião' : 'Agendar retorno'}
       rodape={
         <>
           {erro && <p className="mr-auto text-sm font-medium text-red-600 dark:text-red-400">{erro}</p>}
@@ -381,7 +380,7 @@ export function ScheduleModal({ prefill, onFechar }: { prefill: AgendamentoPrefi
 
         {/* Tipo */}
         <Secao titulo="Tipo">
-          <div className="grid grid-cols-3 gap-1 rounded-full bg-slate-100 p-1 dark:bg-slate-800/80" role="radiogroup" aria-label="Tipo">
+          <div className="grid grid-cols-2 gap-1 rounded-full bg-slate-100 p-1 dark:bg-slate-800/80" role="radiogroup" aria-label="Tipo">
             {TIPOS.map((t) => (
               <button
                 key={t}

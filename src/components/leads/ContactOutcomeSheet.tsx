@@ -6,7 +6,7 @@ import { useToast } from '../../store/ToastContext';
 import { RESULTADOS, RESULTADOS_POR_CANAL } from '../../lib/labels';
 import { ATALHOS_AGENDA, dataDaquiA } from '../../lib/agendamento';
 import { formatData, formatHora, fromInputDate } from '../../lib/dates';
-import { abrirWhatsApp, preencherModelo } from '../../lib/whatsapp';
+import { linkWhatsApp, preencherModelo } from '../../lib/whatsapp';
 import { cn } from '../../lib/cn';
 import { WhatsAppIcon } from '../ui/WhatsAppIcon';
 
@@ -169,13 +169,15 @@ export function ContactOutcomeSheet({ contato, onFechar }: { contato: ContatoEmA
           <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-400">Reabrir com modelo</p>
           <div className="flex gap-1.5 overflow-x-auto pb-1">
             {config.modelos.map((m) => (
-              <button
+              <a
                 key={m.id}
+                href={linkWhatsApp(lead.telefone, preencherModelo(m.texto, lead, config))}
+                target="_blank"
+                rel="noopener noreferrer"
                 className={cn(chip(false), 'shrink-0')}
-                onClick={() => abrirWhatsApp(lead.telefone, preencherModelo(m.texto, lead, config))}
               >
                 {m.nome}
-              </button>
+              </a>
             ))}
           </div>
         </div>

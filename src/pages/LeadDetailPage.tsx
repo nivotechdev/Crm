@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, type ReactNode } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, CalendarClock, CalendarPlus, Check, MessageSquareText, ClipboardEdit, Phone, Send, Trash2 } from 'lucide-react';
 import type { Lead, Temperatura } from '../types';
@@ -10,7 +10,7 @@ import { useHotkeys } from '../hooks/useHotkeys';
 import { formatData, formatHora, tempoRelativoAgenda } from '../lib/dates';
 import { formatTelefone } from '../lib/format';
 import { FORMATOS_REUNIAO, MOTIVOS_PERDA, OBJETIVOS, SIM_NAO_TALVEZ, TEMPERATURAS, URGENCIAS, opcoes } from '../lib/labels';
-import { linkTelefone, preencherModelo } from '../lib/whatsapp';
+import { linkTelefone, linkWhatsApp, preencherModelo } from '../lib/whatsapp';
 import { cn } from '../lib/cn';
 import { Avatar } from '../components/ui/Avatar';
 import { Button } from '../components/ui/Button';
@@ -23,6 +23,9 @@ import { LastContactBadge } from '../components/leads/LastContactBadge';
 import { Timeline } from '../components/leads/Timeline';
 
 type Aba = 'historico' | 'dados';
+
+/** Tela de toque (celular/tablet): Enter quebra a linha em vez de salvar. */
+const toqueGrosso = () => window.matchMedia('(pointer: coarse)').matches;
 
 const acaoBase =
   'flex h-[4.25rem] min-w-0 flex-col items-center justify-center gap-1 rounded-2xl px-0.5 text-[11.5px] font-semibold tracking-tight sm:text-xs sm:tracking-normal transition-all active:scale-[.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500';
@@ -55,6 +58,14 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
   const [menuWpp, setMenuWpp] = useState(false);
   const [menuRegistrar, setMenuRegistrar] = useState(false);
   const notaRef = useRef<HTMLTextAreaElement>(null);
+
+  // O campo de anotação cresce com o texto (até ~8 linhas)
+  useLayoutEffect(() => {
+    const el = notaRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
+  }, [nota]);
 
   const historico = useMemo(
     () => atividades.filter((a) => a.leadId === lead.id).sort((a, b) => b.criadoEm.localeCompare(a.criadoEm)),
@@ -137,10 +148,16 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
             <Phone className="h-5 w-5" />
             <span className="max-w-full truncate">Ligar</span>
           </a>
-          <button type="button" onClick={() => contatoRapido(lead, 'whatsapp')} className={cn(acaoBase, 'bg-[#1DA851] text-white hover:bg-[#178a45]')}>
+          <a
+            href={linkWhatsApp(lead.telefone)}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => contatoRapido(lead, 'whatsapp', { abrir: false })}
+            className={cn(acaoBase, 'bg-[#1DA851] text-white hover:bg-[#178a45]')}
+          >
             <WhatsAppIcon className="h-5 w-5" />
             <span className="max-w-full truncate">WhatsApp</span>
-          </button>
+          </a>
           <div className="relative">
             <button
               type="button"
@@ -161,18 +178,20 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
                 <div role="menu" className="absolute left-1/2 top-full z-20 mt-2 w-64 -translate-x-1/2 rounded-2xl border border-slate-200/80 bg-white p-1.5 shadow-pop dark:border-slate-700 dark:bg-slate-800">
                   <p className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-400">Abrir WhatsApp com</p>
                   {config.modelos.map((m) => (
-                    <button
+                    <a
                       key={m.id}
-                      type="button"
                       role="menuitem"
+                      href={linkWhatsApp(lead.telefone, preencherModelo(m.texto, lead, config))}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="block w-full rounded-xl px-3 py-2.5 text-left text-sm hover:bg-slate-100 dark:hover:bg-slate-700"
                       onClick={() => {
                         setMenuWpp(false);
-                        contatoRapido(lead, 'whatsapp', { texto: preencherModelo(m.texto, lead, config) });
+                        contatoRapido(lead, 'whatsapp', { abrir: false });
                       }}
                     >
                       {m.nome}
-                    </button>
+                    </a>
                   ))}
                   <Link to="/configuracoes#modelos" className="block rounded-xl px-3 py-2 text-xs font-medium text-brand-700 hover:bg-slate-100 dark:text-brand-300 dark:hover:bg-slate-700">
                     Gerenciar modelos
@@ -435,24 +454,36 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
         <Card className={cn(aba !== 'historico' && 'hidden md:block', 'md:self-start')}>
           <CardHeader titulo="Linha do tempo" subtitulo={`${historico.length} registros`} />
           <div className="px-5 pb-6">
-            <div className="mb-5 flex gap-2">
-              <textarea
-                ref={notaRef}
-                value={nota}
-                onChange={(e) => setNota(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    enviarNota();
-                  }
-                }}
-                rows={1}
-                placeholder="Adicionar anotação… (Enter para salvar)"
-                className="min-h-[44px] flex-1 resize-none rounded-[22px] border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none placeholder:text-slate-400 focus:border-brand-500 focus:bg-white focus:ring-4 focus:ring-brand-500/15 dark:border-slate-700 dark:bg-slate-800"
-              />
-              <Button variante="primario" aria-label="Salvar anotação" onClick={enviarNota} disabled={!nota.trim()} className="h-11 w-11 shrink-0 px-0">
-                <Send className="h-4 w-4" />
-              </Button>
+            {/* Campo de anotação: cresce com o texto, botão de enviar dentro do campo */}
+            <div className="mb-6">
+              <div className="flex items-end gap-2 rounded-[22px] border border-slate-200 bg-slate-50 py-1.5 pl-4 pr-1.5 transition-colors focus-within:border-brand-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-brand-500/15 dark:border-slate-700 dark:bg-slate-800 dark:focus-within:bg-slate-900">
+                <textarea
+                  ref={notaRef}
+                  value={nota}
+                  onChange={(e) => setNota(e.target.value)}
+                  onKeyDown={(e) => {
+                    // No computador, Enter salva e Shift+Enter quebra a linha; no celular, Enter quebra a linha
+                    if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing && !toqueGrosso()) {
+                      e.preventDefault();
+                      enviarNota();
+                    }
+                  }}
+                  rows={1}
+                  aria-label="Nova anotação"
+                  placeholder="Escreva uma anotação…"
+                  className="block max-h-40 min-h-[2rem] flex-1 resize-none border-0 bg-transparent py-1.5 text-sm leading-5 text-slate-900 outline-none placeholder:text-slate-400 dark:text-slate-100"
+                />
+                <button
+                  type="button"
+                  aria-label="Salvar anotação"
+                  onClick={enviarNota}
+                  disabled={!nota.trim()}
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-600 text-white transition-all hover:bg-brand-700 active:scale-95 disabled:bg-slate-200 disabled:text-slate-400 dark:disabled:bg-slate-700 dark:disabled:text-slate-500"
+                >
+                  <Send className="h-4 w-4" />
+                </button>
+              </div>
+              <p className="mt-1.5 hidden pl-4 text-[11px] text-slate-400 lg:block">Enter salva · Shift + Enter quebra a linha</p>
             </div>
             <Timeline atividades={historico} motivoPerda={lead.motivoPerda} />
           </div>

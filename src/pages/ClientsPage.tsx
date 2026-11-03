@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, CalendarClock, ExternalLink, Gavel, Gift, Plus, Search, Trash2, UserCheck } from 'lucide-react';
+import { ArrowLeft, CalendarClock, Phone, ExternalLink, Gavel, Gift, Plus, Search, Trash2, UserCheck } from 'lucide-react';
 import type { Cliente, StatusCliente } from '../types';
 import { useData } from '../store/DataContext';
 import { useAcoes } from '../store/AcoesContext';
@@ -10,7 +10,7 @@ import { diasAteAssembleia, precisaPedirIndicacao } from '../lib/clientes';
 import { formatData, fromInputDate, tempoRelativoAgenda, toInputDate } from '../lib/dates';
 import { formatBRL, formatBRLCompacto, formatTelefone, mascaraTelefone, normalizarBusca, somenteDigitos } from '../lib/format';
 import { SIM_NAO_TALVEZ, STATUS_CLIENTE, TIPOS_BEM, opcoes } from '../lib/labels';
-import { abrirWhatsApp, linkTelefone, preencherModelo } from '../lib/whatsapp';
+import { linkTelefone, linkWhatsApp, preencherModelo } from '../lib/whatsapp';
 import { cn } from '../lib/cn';
 import { Avatar } from '../components/ui/Avatar';
 import { Button } from '../components/ui/Button';
@@ -127,9 +127,15 @@ export default function ClientsPage() {
                       {tempoRelativoAgenda(c.proximaAssembleia!, now)}
                     </span>
                     {modeloAssembleia && (
-                      <Button tamanho="sm" variante="whatsapp" aria-label="Lembrar no WhatsApp" className="w-8 px-0" onClick={() => abrirWhatsApp(c.telefone, preencherModelo(modeloAssembleia.texto, c, config))}>
+                      <a
+                        href={linkWhatsApp(c.telefone, preencherModelo(modeloAssembleia.texto, c, config))}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`Lembrar ${c.nome} da assembleia no WhatsApp`}
+                        className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#1DA851] font-semibold text-white transition-colors hover:bg-[#178a45] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 h-8 w-8"
+                      >
                         <WhatsAppIcon className="h-4 w-4" />
-                      </Button>
+                      </a>
                     )}
                   </li>
                 ))}
@@ -146,17 +152,15 @@ export default function ClientsPage() {
                       <p className="truncate text-sm font-medium">{c.nome}</p>
                       <p className="text-xs text-slate-500">{c.indicacaoPedidaEm ? `Último pedido: ${formatData(c.indicacaoPedidaEm)}` : 'Nunca pediu indicação'}</p>
                     </button>
-                    <Button
-                      tamanho="sm"
-                      variante="whatsapp"
-                      icone={<WhatsAppIcon className="h-4 w-4" />}
-                      onClick={() => {
-                        abrirWhatsApp(c.telefone, modeloIndicacao ? preencherModelo(modeloIndicacao.texto, c, config) : undefined);
-                        registrarPedidoIndicacao(c.id).then(() => toast(`Pedido de indicação registrado · ${c.nome}`));
-                      }}
+                    <a
+                      href={linkWhatsApp(c.telefone, modeloIndicacao ? preencherModelo(modeloIndicacao.texto, c, config) : undefined)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => registrarPedidoIndicacao(c.id).then(() => toast(`Pedido de indicação registrado · ${c.nome}`))}
+                      className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#1DA851] font-semibold text-white transition-colors hover:bg-[#178a45] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 h-8 px-3 text-xs"
                     >
-                      Pedir
-                    </Button>
+                      <WhatsAppIcon className="h-4 w-4" /> Pedir
+                    </a>
                   </li>
                 ))}
                 {alertasIndicacao.length > 5 && (
@@ -267,21 +271,20 @@ function ClienteModal({ cliente: c, onFechar }: { cliente: Cliente | null; onFec
     <Modal aberto onFechar={onFechar} titulo={c.nome} subtitulo={formatTelefone(c.telefone)} tamanho="lg">
       <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
         <a href={linkTelefone(c.telefone)} className="flex h-11 items-center justify-center gap-2 rounded-full bg-brand-600 text-sm font-semibold text-white hover:bg-brand-700">
-          Ligar
+          <Phone className="h-4 w-4" /> Ligar
         </a>
-        <Button variante="whatsapp" className="h-11" icone={<WhatsAppIcon className="h-4 w-4" />} onClick={() => abrirWhatsApp(c.telefone)}>
-          WhatsApp
-        </Button>
-        <Button
-          className="col-span-2 h-11 sm:col-span-1"
-          icone={<Gift className="h-4 w-4" />}
-          onClick={() => {
-            abrirWhatsApp(c.telefone, modeloIndicacao ? preencherModelo(modeloIndicacao.texto, c, config) : undefined);
-            registrarPedidoIndicacao(c.id).then(() => toast('Pedido de indicação registrado'));
-          }}
+        <a href={linkWhatsApp(c.telefone)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#1DA851] font-semibold text-white transition-colors hover:bg-[#178a45] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 h-11 text-sm">
+          <WhatsAppIcon className="h-4 w-4" /> WhatsApp
+        </a>
+        <a
+          href={linkWhatsApp(c.telefone, modeloIndicacao ? preencherModelo(modeloIndicacao.texto, c, config) : undefined)}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => registrarPedidoIndicacao(c.id).then(() => toast('Pedido de indicação registrado'))}
+          className="col-span-2 inline-flex h-11 items-center justify-center gap-2 rounded-full border border-slate-200 bg-white text-sm font-semibold text-slate-800 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800 sm:col-span-1"
         >
-          Pedir indicação
-        </Button>
+          <Gift className="h-4 w-4" /> Pedir indicação
+        </a>
       </div>
       <div className="grid gap-x-6 sm:grid-cols-2">
         <div>

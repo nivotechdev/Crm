@@ -68,31 +68,31 @@ type SeedLead = {
 const LEADS: SeedLead[] = [
   { nome: 'Mariana Albuquerque', tel: '62981234567', cidade: 'Goiânia', origem: 'Instagram', objetivo: 'imovel', valor: 350000, parcela: 2200, temp: 'quente', etapa: 'negociacao', ult: 0, canal: 'whatsapp', criado: 34, lance: 'sim', valorLance: 60000, etiquetas: ['Apartamento', 'Lance'], decisor: 'Cônjuge (Rafael)', prazoUso: 'Em até 12 meses', obs: 'Quer apartamento de 3 quartos no Setor Bueno.' },
   { nome: 'Rafael Monteiro', tel: '62992341188', cidade: 'Aparecida de Goiânia', origem: 'Indicação', indicadoPor: 'Carlos Pereira', objetivo: 'veiculo', valor: 90000, parcela: 1300, temp: 'morno', etapa: 'diagnostico', ult: 0, canal: 'ligacao', criado: 12, lance: 'talvez', objecao: 'Acha que demora para ser contemplado' },
-  { nome: 'Juliana Castro', tel: '61998123344', cidade: 'Brasília', origem: 'Tráfego pago', objetivo: 'imovel', valor: 500000, parcela: 3500, temp: 'quente', etapa: 'simulacao', ult: 1, canal: 'whatsapp', criado: 21, lance: 'sim', valorLance: 100000, etiquetas: ['Casa'], prazoUso: 'Em até 6 meses' },
+  { nome: 'Juliana Castro', tel: '61998123344', cidade: 'Brasília', origem: 'Tráfego pago', objetivo: 'imovel', valor: 500000, parcela: 3500, temp: 'quente', etapa: 'negociacao', ult: 1, canal: 'whatsapp', criado: 21, lance: 'sim', valorLance: 100000, etiquetas: ['Casa'], prazoUso: 'Em até 6 meses' },
   { nome: 'Pedro Henrique Lima', tel: '62984776612', cidade: 'Goiânia', origem: 'Lista fria', objetivo: 'veiculo', valor: 70000, parcela: 1000, temp: 'frio', etapa: 'contato', ult: 2, canal: 'ligacao', criado: 9 },
   { nome: 'Ana Beatriz Rocha', tel: '11976542210', cidade: 'São Paulo', origem: 'Instagram', objetivo: 'investimento', valor: 300000, parcela: 2500, temp: 'morno', etapa: 'reuniao', ult: 3, canal: 'whatsapp', criado: 27, etiquetas: ['Investidor'], objecao: 'Comparando com renda fixa' },
   { nome: 'Lucas Fernandes', tel: '62991027788', cidade: 'Anápolis', origem: 'Indicação', indicadoPor: 'Mariana Albuquerque', objetivo: 'pesado', valor: 450000, parcela: 6000, temp: 'quente', etapa: 'negociacao', ult: 1, canal: 'ligacao', criado: 40, lance: 'sim', valorLance: 90000, etiquetas: ['Caminhão', 'PJ'], decisor: 'Sócio (Márcio)' },
   { nome: 'Camila Duarte', tel: '62983459090', cidade: 'Goiânia', origem: 'Tráfego pago', objetivo: 'imovel', valor: 280000, parcela: 1800, temp: 'morno', etapa: 'contato', ult: 5, canal: 'whatsapp', criado: 15 },
   { nome: 'Bruno Carvalho', tel: '34998765432', cidade: 'Uberlândia', origem: 'Evento', objetivo: 'veiculo', valor: 120000, parcela: 1700, temp: 'morno', etapa: 'diagnostico', ult: 4, canal: 'ligacao', criado: 22, jaTeve: 'sim' },
-  { nome: 'Fernanda Ribeiro', tel: '62995551234', cidade: 'Goiânia', origem: 'Cliente antigo', objetivo: 'imovel', valor: 400000, parcela: 2800, temp: 'quente', etapa: 'simulacao', ult: 0, canal: 'ligacao', criado: 18, lance: 'talvez', etiquetas: ['Terreno'] },
+  { nome: 'Fernanda Ribeiro', tel: '62995551234', cidade: 'Goiânia', origem: 'Cliente antigo', objetivo: 'imovel', valor: 400000, parcela: 2800, temp: 'quente', etapa: 'negociacao', ult: 0, canal: 'ligacao', criado: 18, lance: 'talvez', etiquetas: ['Terreno'] },
   { nome: 'Gustavo Almeida', tel: '62982223456', cidade: 'Trindade', origem: 'Lista fria', objetivo: 'veiculo', valor: 60000, parcela: 900, temp: 'frio', etapa: 'novo', ult: null, criado: 1 },
   { nome: 'Patrícia Gomes', tel: '61981112233', cidade: 'Brasília', origem: 'Instagram', objetivo: 'servicos', valor: 30000, parcela: 600, temp: 'frio', etapa: 'novo', ult: null, criado: 0, obs: 'Quer usar para reforma + festa de casamento.' },
   { nome: 'Thiago Nascimento', tel: '62993334455', cidade: 'Goiânia', origem: 'Tráfego pago', objetivo: 'imovel', valor: 250000, parcela: 1600, temp: 'morno', etapa: 'contato', ult: 8, canal: 'whatsapp', criado: 30 },
   { nome: 'Larissa Martins', tel: '19997008899', cidade: 'Campinas', origem: 'Indicação', indicadoPor: 'Fernanda Ribeiro', objetivo: 'imovel', valor: 600000, parcela: 4000, temp: 'quente', etapa: 'reuniao', ult: 2, canal: 'whatsapp', criado: 10, lance: 'sim', valorLance: 150000, decisor: 'Cônjuge' },
   { nome: 'Diego Souza', tel: '62986667788', cidade: 'Senador Canedo', origem: 'Lista fria', objetivo: 'veiculo', valor: 80000, parcela: 1100, temp: 'frio', etapa: 'contato', ult: 12, canal: 'ligacao', criado: 25, objecao: 'Sem tempo para conversar' },
   { nome: 'Aline Teixeira', tel: '62994445566', cidade: 'Goiânia', origem: 'Instagram', objetivo: 'imovel', valor: 320000, parcela: 2000, temp: 'morno', etapa: 'diagnostico', ult: 6, canal: 'whatsapp', criado: 19 },
-  { nome: 'Rodrigo Barbosa', tel: '16988881212', cidade: 'Ribeirão Preto', origem: 'Evento', objetivo: 'pesado', valor: 380000, parcela: 5200, temp: 'morno', etapa: 'simulacao', ult: 9, canal: 'ligacao', criado: 33, etiquetas: ['Trator', 'Agro'] },
+  { nome: 'Rodrigo Barbosa', tel: '16988881212', cidade: 'Ribeirão Preto', origem: 'Evento', objetivo: 'pesado', valor: 380000, parcela: 5200, temp: 'morno', etapa: 'negociacao', ult: 9, canal: 'ligacao', criado: 33, etiquetas: ['Trator', 'Agro'] },
   { nome: 'Vanessa Pinto', tel: '62989893434', cidade: 'Goiânia', origem: 'Tráfego pago', objetivo: 'veiculo', valor: 110000, parcela: 1500, temp: 'frio', etapa: 'novo', ult: null, criado: 2 },
   { nome: 'Marcelo Azevedo', tel: '62991915656', cidade: 'Aparecida de Goiânia', origem: 'Cliente antigo', objetivo: 'investimento', valor: 200000, parcela: 1800, temp: 'morno', etapa: 'negociacao', ult: 3, canal: 'whatsapp', criado: 45, objecao: 'Quer taxa menor' },
   { nome: 'Beatriz Correia', tel: '31992927878', cidade: 'Belo Horizonte', origem: 'Instagram', objetivo: 'imovel', valor: 450000, parcela: 3000, temp: 'quente', etapa: 'reuniao', ult: 0, canal: 'whatsapp', criado: 8 },
   { nome: 'Felipe Moreira', tel: '62983839191', cidade: 'Goiânia', origem: 'Lista fria', objetivo: 'veiculo', valor: 75000, parcela: 1000, temp: 'frio', etapa: 'contato', ult: 21, canal: 'ligacao', criado: 50 },
   { nome: 'Renata Vieira', tel: '62997972323', cidade: 'Anápolis', origem: 'Indicação', indicadoPor: 'Lucas Fernandes', objetivo: 'imovel', valor: 270000, parcela: 1700, temp: 'morno', etapa: 'diagnostico', ult: 1, canal: 'ligacao', criado: 6 },
   { nome: 'André Cardoso', tel: '41996464545', cidade: 'Curitiba', origem: 'Tráfego pago', objetivo: 'servicos', valor: 40000, parcela: 800, temp: 'frio', etapa: 'novo', ult: null, criado: 0 },
-  { nome: 'Gabriela Mendes', tel: '62985856767', cidade: 'Goiânia', origem: 'Evento', objetivo: 'veiculo', valor: 95000, parcela: 1300, temp: 'morno', etapa: 'simulacao', ult: 0, canal: 'whatsapp', criado: 14 },
+  { nome: 'Gabriela Mendes', tel: '62985856767', cidade: 'Goiânia', origem: 'Evento', objetivo: 'veiculo', valor: 95000, parcela: 1300, temp: 'morno', etapa: 'negociacao', ult: 0, canal: 'whatsapp', criado: 14 },
   { nome: 'Eduardo Santana', tel: '62998981010', cidade: 'Goiânia', origem: 'Indicação', indicadoPor: 'Fernanda Ribeiro', objetivo: 'imovel', valor: 300000, parcela: 2000, temp: 'quente', etapa: 'ganho', ult: 1, canal: 'ligacao', criado: 38 },
   { nome: 'Carolina Freitas', tel: '62987871414', cidade: 'Goiânia', origem: 'Instagram', objetivo: 'veiculo', valor: 85000, parcela: 1200, temp: 'quente', etapa: 'ganho', ult: 0, canal: 'whatsapp', criado: 26 },
   { nome: 'Leonardo Araújo', tel: '61993035050', cidade: 'Brasília', origem: 'Cliente antigo', objetivo: 'investimento', valor: 250000, parcela: 2100, temp: 'quente', etapa: 'ganho', ult: 15, canal: 'ligacao', criado: 60 },
-  { nome: 'Tatiane Lopes', tel: '62984044747', cidade: 'Goiânia', origem: 'Tráfego pago', objetivo: 'imovel', valor: 260000, parcela: 1500, temp: 'frio', etapa: 'perdido', ult: 10, canal: 'whatsapp', criado: 42, perda: 'preferiu_financiamento', etapaAntesPerda: 'simulacao' },
+  { nome: 'Tatiane Lopes', tel: '62984044747', cidade: 'Goiânia', origem: 'Tráfego pago', objetivo: 'imovel', valor: 260000, parcela: 1500, temp: 'frio', etapa: 'perdido', ult: 10, canal: 'whatsapp', criado: 42, perda: 'preferiu_financiamento', etapaAntesPerda: 'negociacao' },
   { nome: 'Ricardo Batista', tel: '62996061818', cidade: 'Trindade', origem: 'Lista fria', objetivo: 'veiculo', valor: 65000, parcela: 800, temp: 'frio', etapa: 'perdido', ult: 25, canal: 'ligacao', criado: 55, perda: 'sem_dinheiro', etapaAntesPerda: 'diagnostico' },
   { nome: 'Isabela Cunha', tel: '11985452929', cidade: 'São Paulo', origem: 'Tráfego pago', objetivo: 'imovel', valor: 380000, parcela: 2400, temp: 'frio', etapa: 'perdido', ult: 40, canal: 'whatsapp', criado: 70, perda: 'nao_responde', etapaAntesPerda: 'contato' },
   { nome: 'Sérgio Ramos', tel: '62990102020', cidade: 'Goiânia', origem: 'Instagram', objetivo: 'imovel', valor: 220000, parcela: 1500, temp: 'morno', etapa: 'contato', ult: 45, canal: 'whatsapp', criado: 80, objecao: 'Vai esperar o 13º' },
@@ -247,9 +247,9 @@ export async function popularDadosExemplo(): Promise<void> {
     tarefa({ leadId: L['Thiago Nascimento'], titulo: 'Retornar contato', tipo: 'retorno', dataHora: diasAFrente(-2, 9), diaInteiro: true }),
     tarefa({ leadId: L['Rodrigo Barbosa'], titulo: 'Cobrar retorno da simulação', tipo: 'retorno', dataHora: diasAFrente(-1, 11), diaInteiro: false }),
     tarefa({ leadId: L['Ana Beatriz Rocha'], titulo: 'Simulação detalhada', tipo: 'reuniao', formato: 'presencial', local: 'Escritório — Av. Paulista, 1000', dataHora: diasAFrente(1, 15), diaInteiro: false }),
-    tarefa({ leadId: L['Marcelo Azevedo'], titulo: 'Enviar proposta final', tipo: 'tarefa', dataHora: diasAFrente(3, 9), diaInteiro: true }),
+    tarefa({ leadId: L['Marcelo Azevedo'], titulo: 'Retornar com a proposta final', tipo: 'retorno', dataHora: diasAFrente(3, 9), diaInteiro: true }),
     tarefa({ leadId: L['Bruno Carvalho'], titulo: 'Retornar contato', tipo: 'retorno', dataHora: diasAFrente(5, 9), diaInteiro: true }),
-    tarefa({ leadId: L['Mariana Albuquerque'], titulo: 'Enviar contrato para assinatura', tipo: 'tarefa', dataHora: diasAFrente(-1, 9), diaInteiro: true, concluida: true, concluidaEm: diasAtras(1) }),
+    tarefa({ leadId: L['Mariana Albuquerque'], titulo: 'Confirmar assinatura do contrato', tipo: 'retorno', dataHora: diasAFrente(-1, 9), diaInteiro: true, concluida: true, concluidaEm: diasAtras(1) }),
   ];
 
   // Clientes (pós-venda)
@@ -279,8 +279,27 @@ export async function popularDadosExemplo(): Promise<void> {
   db.marcarInicializado();
 }
 
+/** Etapas que deixaram de existir → para onde vão os leads que estavam nelas. */
+const ETAPAS_REMOVIDAS: Record<string, string> = {
+  simulacao: 'negociacao', // "Simulação enviada" já é negociação
+};
+
+/** Ajusta dados salvos por versões anteriores do app. */
+async function migrarDados(): Promise<void> {
+  const cfg = await db.lerConfig(CONFIG_PADRAO);
+  const removidas = cfg.etapas.filter((e) => e.id in ETAPAS_REMOVIDAS);
+  if (removidas.length === 0) return;
+  const etapas = cfg.etapas.filter((e) => !(e.id in ETAPAS_REMOVIDAS));
+  const existe = new Set(etapas.map((e) => e.id));
+  const destino = (id: string) => (existe.has(ETAPAS_REMOVIDAS[id]) ? ETAPAS_REMOVIDAS[id] : etapas.find((e) => e.tipo === 'aberta')!.id);
+  await db.gravarConfig({ ...cfg, etapas });
+  const leads = await db.listar<Lead>('leads');
+  for (const l of leads) if (l.etapaId in ETAPAS_REMOVIDAS) await db.atualizar<Lead>('leads', l.id, { etapaId: destino(l.etapaId) });
+}
+
 export async function inicializarSeNecessario(): Promise<void> {
   if (!db.jaInicializado()) await popularDadosExemplo();
+  else await migrarDados();
 }
 
 export async function exportarTudo(): Promise<string> {

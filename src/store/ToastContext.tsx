@@ -7,7 +7,8 @@ interface Toast {
   id: number;
   mensagem: string;
   tipo: TipoToast;
-  acao?: { label: string; onClick: () => void };
+  /** Ação do aviso: um botão (onClick) ou um link externo (href, ex.: WhatsApp). */
+  acao?: { label: string; onClick?: () => void; href?: string };
 }
 type ToastFn = (mensagem: string, opts?: { tipo?: TipoToast; acao?: Toast['acao']; duracao?: number }) => void;
 
@@ -45,11 +46,22 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             {t.tipo === 'erro' && <XCircle className="h-5 w-5 shrink-0 text-red-400" />}
             {t.tipo === 'info' && <Info className="h-5 w-5 shrink-0 text-slate-400" />}
             <span className="flex-1">{t.mensagem}</span>
-            {t.acao && (
+            {t.acao?.href && (
+              <a
+                href={t.acao.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shrink-0 rounded-full px-3 py-1 font-semibold text-brand-300 hover:bg-white/10"
+                onClick={() => fechar(t.id)}
+              >
+                {t.acao.label}
+              </a>
+            )}
+            {t.acao && !t.acao.href && (
               <button
                 className="rounded-full px-3 py-1 font-semibold text-brand-300 hover:bg-white/10"
                 onClick={() => {
-                  t.acao!.onClick();
+                  t.acao!.onClick?.();
                   fechar(t.id);
                 }}
               >

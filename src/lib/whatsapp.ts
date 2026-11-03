@@ -2,20 +2,25 @@ import type { Configuracoes, Lead } from '../types';
 import { formatBRL, primeiroNome, somenteDigitos } from './format';
 import { OBJETIVOS } from './labels';
 
-/** Número no formato internacional exigido pelo wa.me (55 + DDD + número). */
-export function numeroWhatsApp(telefone: string): string {
-  const d = somenteDigitos(telefone);
+/**
+ * Número no formato internacional (55 + DDD + número), só dígitos.
+ * Aceita "(62) 99999-8888", "062 99999-8888", "+55 62 99999-8888" e "5562999998888".
+ */
+export function numeroInternacional(telefone: string): string {
+  const d = somenteDigitos(telefone).replace(/^0+/, '');
   if (d.startsWith('55') && d.length >= 12) return d;
   return `55${d}`;
 }
 
+/** Link oficial do WhatsApp: abre o app no celular e o WhatsApp Web/desktop no computador. */
 export function linkWhatsApp(telefone: string, texto?: string): string {
-  const base = `https://wa.me/${numeroWhatsApp(telefone)}`;
+  const base = `https://wa.me/${numeroInternacional(telefone)}`;
   return texto ? `${base}?text=${encodeURIComponent(texto)}` : base;
 }
 
+/** Link de ligação: abre o aplicativo de telefone já com o número. */
 export function linkTelefone(telefone: string): string {
-  return `tel:+${numeroWhatsApp(telefone)}`;
+  return `tel:+${numeroInternacional(telefone)}`;
 }
 
 export const VARIAVEIS_MODELO = ['{nome}', '{primeiroNome}', '{valor}', '{objetivo}', '{cidade}', '{vendedor}'] as const;
@@ -32,7 +37,10 @@ export function preencherModelo(texto: string, dados: DadosModelo, cfg: Pick<Con
     .replace(/\{vendedor\}/g, cfg.nomeVendedor ?? '');
 }
 
-/** Abre o WhatsApp numa nova aba. Deve ser chamado direto no handler do clique. */
+/**
+ * Abre o WhatsApp a partir de código (atalho de teclado, por exemplo).
+ * Nos botões, prefira um <a href={linkWhatsApp(...)}>: é o caminho mais confiável.
+ */
 export function abrirWhatsApp(telefone: string, texto?: string) {
   const a = document.createElement('a');
   a.href = linkWhatsApp(telefone, texto);

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { CheckSquare, Plus, Search, SlidersHorizontal, Tag, Trash2, Users, X } from 'lucide-react';
+import { Plus, Search, SlidersHorizontal, Tag, Trash2, Users, X } from 'lucide-react';
 import type { Objetivo, Temperatura } from '../types';
 import { useData } from '../store/DataContext';
 import { useAcoes } from '../store/AcoesContext';
@@ -8,17 +8,15 @@ import { useToast } from '../store/ToastContext';
 import { useNow } from '../store/NowContext';
 import { useDerivados } from '../hooks/useDerivados';
 import { useHotkeys } from '../hooks/useHotkeys';
-import { aplicaFiltroRapido, buscaLead, FILTROS_RAPIDOS, ORDENACOES, ordenar, type FiltroRapido, type Ordenacao } from '../lib/leadFilters';
+import { buscaLead, ORDENACOES, ordenar, type Ordenacao } from '../lib/leadFilters';
 import { OBJETIVOS, TEMPERATURAS, opcoes } from '../lib/labels';
 import { prefs } from '../services/storage';
 import { cn } from '../lib/cn';
 import { Button } from '../components/ui/Button';
-import { Chip } from '../components/ui/Chip';
 import { Select, inputBase } from '../components/ui/Field';
 import { EmptyState } from '../components/ui/EmptyState';
 import { LeadCard } from '../components/leads/LeadListItem';
 import { PageHeader } from '../components/layout/PageHeader';
-import { DailyCounter } from '../components/layout/DailyCounter';
 import { StageSwitcher, type ResumoEtapa } from '../components/leads/StageSwitcher';
 import { formatBRLCompacto } from '../lib/format';
 
@@ -34,14 +32,6 @@ export default function LeadsListPage() {
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const gradeRef = useRef<HTMLDivElement>(null);
-
-  const filtro = (params.get('filtro') as FiltroRapido | null) ?? null;
-  const setFiltro = (f: FiltroRapido | null) => {
-    const p = new URLSearchParams(params);
-    if (f) p.set('filtro', f);
-    else p.delete('filtro');
-    setParams(p, { replace: true });
-  };
 
   // Cada etapa do funil é uma "tela" (?etapa=<id>); vazio = todas as ativas
   const etapa = params.get('etapa') ?? '';
@@ -70,8 +60,6 @@ export default function LeadsListPage() {
 
   useEffect(() => prefs.set('lista:ordem', ordem), [ordem]);
 
-  const ctxFiltro = { retornoHojeIds: d.retornoHojeIds, vermelhoApartirDe: config.laranjaAteDias + 1, now };
-
   const base = useMemo(() => leads.filter((l) => (incluirFechados || etapa ? true : d.isAtivo(l))), [leads, incluirFechados, etapa, d]);
 
   const resumo = useMemo(() => {
@@ -90,18 +78,10 @@ export default function LeadsListPage() {
     return r;
   }, [leads, config.etapas, d]);
 
-  const contagens = useMemo(() => {
-    const c = {} as Record<FiltroRapido, number>;
-    for (const f of FILTROS_RAPIDOS) c[f.id] = base.filter((l) => aplicaFiltroRapido(l, f.id, ctxFiltro)).length;
-    return c;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [base, d.retornoHojeIds, config.laranjaAteDias, now]);
-
   const lista = useMemo(() => {
     const f = base.filter(
       (l) =>
         buscaLead(l, busca) &&
-        (!filtro || aplicaFiltroRapido(l, filtro, ctxFiltro)) &&
         (!etapa || l.etapaId === etapa) &&
         (!temp || l.temperatura === temp) &&
         (!objetivo || l.objetivo === objetivo) &&
@@ -109,7 +89,7 @@ export default function LeadsListPage() {
     );
     return ordenar(f, ordem, d.proximaTarefaPorLead);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [base, busca, filtro, etapa, temp, objetivo, origem, ordem, d.proximaTarefaPorLead, now]);
+  }, [base, busca, etapa, temp, objetivo, origem, ordem, d.proximaTarefaPorLead, now]);
 
   useEffect(() => setFoco((f) => Math.min(f, lista.length - 1)), [lista.length]);
 
@@ -187,7 +167,7 @@ export default function LeadsListPage() {
       <PageHeader
         titulo={etapaAtual ? etapaAtual.nome : 'Leads'}
         subtitulo={
-          lista.length === (resumo[etapa]?.qtd ?? -1) || filtro || busca
+          lista.length === (resumo[etapa]?.qtd ?? -1) || busca
             ? `${lista.length} ${lista.length === 1 ? 'lead' : 'leads'} · ${formatBRLCompacto(lista.reduce((s, l) => s + (l.valorCarta ?? 0), 0))} em cartas`
             : `${lista.length} de ${resumo[etapa]?.qtd ?? 0} leads`
         }
@@ -206,19 +186,10 @@ export default function LeadsListPage() {
         }
       />
 
-      <div className="mb-4 flex justify-start lg:mb-5">
-        <div className="lg:hidden">
-          <DailyCounter compacto />
-        </div>
-        <div className="hidden lg:block">
-          <DailyCounter />
-        </div>
-      </div>
-
       <StageSwitcher atual={etapa} resumo={resumo} onChange={setEtapa} />
 
       {/* Busca + controles */}
-      <div className="mb-3 flex gap-2">
+      <div className="mb-5 flex gap-2">
         <div className="relative min-w-0 flex-1">
           <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input
@@ -248,17 +219,6 @@ export default function LeadsListPage() {
         </Button>
       </div>
 
-      {/* Filtros rápidos (1 clique) */}
-      <div className="no-scrollbar -mx-4 mb-5 flex gap-2 overflow-x-auto px-4 md:mx-0 md:flex-wrap md:px-0">
-        <Chip ativo={!filtro} onClick={() => setFiltro(null)}>
-          Todos
-        </Chip>
-        {FILTROS_RAPIDOS.map((f) => (
-          <Chip key={f.id} ativo={filtro === f.id} contador={contagens[f.id]} onClick={() => setFiltro(filtro === f.id ? null : f.id)}>
-            {f.label}
-          </Chip>
-        ))}
-      </div>
 
       {mostrarFiltros && (
         <div className="mb-5 grid animate-fade-in grid-cols-2 gap-2 rounded-3xl border border-slate-200/70 bg-white p-3 dark:border-slate-800 dark:bg-slate-900 md:grid-cols-3 lg:grid-cols-5">
@@ -296,16 +256,14 @@ export default function LeadsListPage() {
               descricao="Cadastre o primeiro lead com só nome e telefone."
               acao={<Button variante="primario" icone={<Plus className="h-4 w-4" />} onClick={() => abrirNovoLead()}>Novo lead</Button>}
             />
-          ) : etapaAtual && !filtro && !busca && (resumo[etapa]?.qtd ?? 0) === 0 ? (
+          ) : etapaAtual && !busca && (resumo[etapa]?.qtd ?? 0) === 0 ? (
             <EmptyState
               icone={<Users className="h-6 w-6" />}
               titulo={`Nenhum lead em “${etapaAtual.nome}”`}
               descricao="Mude a etapa de um lead pelo seletor no card dele, ou cadastre um novo lead."
             />
-          ) : filtro === 'nao_contatados_hoje' ? (
-            <EmptyState icone={<CheckSquare className="h-6 w-6" />} titulo="Todos os leads foram contatados hoje" descricao="Ótimo trabalho. Que tal pedir indicações aos clientes?" />
           ) : (
-            <EmptyState icone={<Search className="h-6 w-6" />} titulo="Nenhum lead com esses filtros" acao={<Button onClick={() => (setFiltro(null), setBusca(''))}>Limpar filtros</Button>} />
+            <EmptyState icone={<Search className="h-6 w-6" />} titulo="Nenhum lead com esses filtros" acao={<Button onClick={() => setBusca('')}>Limpar busca</Button>} />
           )}
         </div>
       ) : (

@@ -11,7 +11,6 @@ export const CONFIG_PADRAO: Configuracoes = {
     { id: 'contato', nome: 'Contato feito', tipo: 'aberta', cor: 'sky' },
     { id: 'diagnostico', nome: 'Diagnóstico', tipo: 'aberta', cor: 'indigo' },
     { id: 'reuniao', nome: 'Reunião agendada', tipo: 'aberta', cor: 'violet' },
-    { id: 'simulacao', nome: 'Simulação enviada', tipo: 'aberta', cor: 'fuchsia' },
     { id: 'negociacao', nome: 'Negociação', tipo: 'aberta', cor: 'amber' },
     { id: 'ganho', nome: 'Fechado (ganho)', tipo: 'ganho', cor: 'emerald' },
     { id: 'perdido', nome: 'Perdido', tipo: 'perdido', cor: 'rose' },

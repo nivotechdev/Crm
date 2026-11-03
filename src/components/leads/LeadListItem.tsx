@@ -71,7 +71,7 @@ export const LeadCard = memo(function LeadCard({ lead, proxima, selecionado, foc
   const aoPressionar = (e: ReactPointerEvent) => {
     if (e.button !== 0) return;
     // Fora do modo de seleção, segurar os botões internos não seleciona
-    if (!modoSelecao && (e.target as HTMLElement).closest('button, select')) return;
+    if (!modoSelecao && (e.target as HTMLElement).closest('button, select, a[data-contato]')) return;
     segurou.current = false;
     inicio.current = { x: e.clientX, y: e.clientY };
     setPressionando(true);

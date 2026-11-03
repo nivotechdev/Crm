@@ -4,25 +4,23 @@ import { ArrowRight, ArrowUpRight, CalendarPlus, Pencil, Phone, Settings } from 
 import { useData } from '../store/DataContext';
 import { useNow } from '../store/NowContext';
 import { useDerivados } from '../hooks/useDerivados';
-import { conversaoPorEtapa, vendasDoMes } from '../lib/stats';
+import { vendasDoMes } from '../lib/stats';
 import { diasSemContato } from '../lib/contactStatus';
 import { diffDiasCalendario, formatDiaSemana, saudacao, tempoRelativoAgenda } from '../lib/dates';
-import { formatBRLCompacto, formatTelefone, primeiroNome } from '../lib/format';
+import { formatBRLCompacto, primeiroNome } from '../lib/format';
 import { precisaPedirIndicacao } from '../lib/clientes';
 import { cn } from '../lib/cn';
 import { Card, CardHeader } from '../components/ui/Card';
 import { EmptyState } from '../components/ui/EmptyState';
 import { WhatsAppIcon } from '../components/ui/WhatsAppIcon';
 import { TaskItem } from '../components/agenda/TaskItem';
-import { ContactStripe, LastContactBadge } from '../components/leads/LastContactBadge';
-import { QuickContactButtons } from '../components/leads/QuickContactButtons';
 import { MetaModal } from '../components/dashboard/MetaModal';
 import { RelatoriosSecao } from '../components/dashboard/RelatoriosSecao';
 import { Button } from '../components/ui/Button';
 import { useAcoes } from '../store/AcoesContext';
 
 export default function DashboardPage() {
-  const { leads, atividades, clientes, config } = useData();
+  const { clientes, config } = useData();
   const now = useNow();
   const d = useDerivados();
   const { abrirAgendamento } = useAcoes();
@@ -38,7 +36,6 @@ export default function DashboardPage() {
   );
   const atrasadosContatados = atrasados.filter((l) => l.ultimoContatoEm).length;
   const nunca = d.leadsAtivos.filter((l) => !l.ultimoContatoEm).length;
-  const conversao = useMemo(() => conversaoPorEtapa(leads, atividades, config), [leads, atividades, config]);
   const vendas = vendasDoMes(clientes, now);
   const assembleias = clientes
     .filter((c) => c.status === 'ativo' && c.proximaAssembleia && diffDiasCalendario(c.proximaAssembleia, now) <= 0 && diffDiasCalendario(c.proximaAssembleia, now) >= -7)
@@ -49,9 +46,6 @@ export default function DashboardPage() {
   const pctMeta = Math.min(1, d.contatosHojeTotal / meta);
   const faltam = Math.max(0, meta - d.contatosHojeTotal);
   const agenda = [...d.tarefasAtrasadas, ...d.tarefasHoje];
-  const abertas = config.etapas.filter((e) => e.tipo === 'aberta');
-  const maxFunil = Math.max(1, ...abertas.map((e) => d.leadsAtivos.filter((l) => l.etapaId === e.id).length));
-  const totalConv = conversao[0]?.alcancaram ? Math.round((conversao[conversao.length - 1].alcancaram / conversao[0].alcancaram) * 100) : 0;
 
   return (
     <div className="mx-auto max-w-[1400px] px-4 py-5 md:px-8 md:py-8">
@@ -122,7 +116,7 @@ export default function DashboardPage() {
         </Card>
         <div className="grid grid-cols-3 gap-3 lg:contents">
           <Kpi titulo="Vendas" valor={String(vendas.qtd)} sub={formatBRLCompacto(vendas.volume)} to="/clientes" />
-          <Kpi titulo="Atrasados" valor={String(atrasadosContatados)} sub={`+${nunca} nunca`} to="/leads?filtro=atrasados" alerta={atrasadosContatados > 0} />
+          <Kpi titulo="Atrasados" valor={String(atrasadosContatados)} sub={`+${nunca} nunca`} to="/leads" alerta={atrasadosContatados > 0} />
           <Kpi titulo="Retornos" valor={String(agenda.length)} sub={d.tarefasAtrasadas.length ? `${d.tarefasAtrasadas.length} atrasado(s)` : 'em dia'} to="/agenda" />
         </div>
       </div>
@@ -151,53 +145,6 @@ export default function DashboardPage() {
             <ul className="divide-y divide-slate-100 pb-3 dark:divide-slate-800">
               {agenda.map((t) => (
                 <TaskItem key={t.id} tarefa={t} lead={t.leadId ? d.leadPorId.get(t.leadId) : undefined} />
-              ))}
-            </ul>
-          )}
-        </Card>
-
-        <Card>
-          <CardHeader titulo="Funil" subtitulo={`${d.leadsAtivos.length} leads ativos · ${totalConv}% viram venda`} acao={<VerTudo to="/leads" />} />
-          <ul className="space-y-3.5 px-5 pb-5">
-            {abertas.map((e) => {
-              const qtd = d.leadsAtivos.filter((l) => l.etapaId === e.id).length;
-              const conv = conversao.find((c) => c.etapa.id === e.id);
-              return (
-                <li key={e.id}>
-                  <Link to={`/leads?etapa=${e.id}`} className="group block">
-                    <div className="mb-1.5 flex items-baseline justify-between text-[13px]">
-                      <span className="font-medium text-slate-700 group-hover:text-brand-700 dark:text-slate-300 dark:group-hover:text-brand-300">{e.nome}</span>
-                      <span className="num flex items-baseline gap-2">
-                        {conv && e.id !== abertas[0].id && <span className="text-[11px] text-slate-400" title="Conversão a partir da etapa anterior">{Math.round(conv.taxa * 100)}%</span>}
-                        <b className="font-semibold text-slate-900 dark:text-white">{qtd}</b>
-                      </span>
-                    </div>
-                    <div className="h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
-                      <div className="h-full rounded-full bg-brand-500 transition-all" style={{ width: `${(qtd / maxFunil) * 100}%` }} />
-                    </div>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </Card>
-
-        <Card>
-          <CardHeader titulo="Precisam de atenção" subtitulo={`Sem contato há ${vermelhoApartir}+ dias ou nunca contatados`} acao={<VerTudo to="/leads?filtro=atrasados" />} />
-          {atrasados.length === 0 ? (
-            <EmptyState titulo="Nenhum lead atrasado" descricao="Todos os leads ativos foram contatados recentemente." />
-          ) : (
-            <ul className="divide-y divide-slate-100 pb-3 dark:divide-slate-800">
-              {atrasados.slice(0, 6).map((l) => (
-                <li key={l.id} className="relative flex items-center gap-3 py-3 pl-5 pr-4">
-                  <ContactStripe ultimoContatoEm={l.ultimoContatoEm} className="inset-y-3 w-[3px] rounded-r-full" />
-                  <Link to={`/leads/${l.id}`} className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-slate-900 hover:text-brand-700 dark:text-white">{l.nome}</p>
-                    <p className="num truncate text-xs text-slate-500">{formatTelefone(l.telefone)}</p>
-                  </Link>
-                  <LastContactBadge ultimoContatoEm={l.ultimoContatoEm} canal={l.ultimoContatoCanal} compacto className="hidden sm:inline-flex" />
-                  <QuickContactButtons lead={l} tamanho="sm" soIcone />
-                </li>
               ))}
             </ul>
           )}

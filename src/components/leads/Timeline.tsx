@@ -20,6 +20,11 @@ const ICONES: Record<Atividade['tipo'], { Icone: (p: { className?: string }) => 
   sistema: { Icone: (p) => <Flag {...p} />, cls: 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400', titulo: 'Sistema' },
 };
 
+/** Etapas que saíram do funil, para o histórico antigo continuar legível. */
+function nomeEtapaRemovida(id: string): string {
+  return id === 'simulacao' ? 'Simulação enviada' : 'Etapa removida';
+}
+
 function rotuloDia(iso: string, now: Date) {
   const d = diffDiasCalendario(iso, now);
   if (d === 0) return 'Hoje';
@@ -52,8 +57,9 @@ export function Timeline({ atividades, motivoPerda }: { atividades: Atividade[];
           <ol className="relative space-y-4 border-l border-slate-200/80 pl-6 dark:border-slate-800">
             {g.itens.map((a) => {
               const meta = ICONES[a.tipo];
-              const de = a.etapaDe ? etapaPorId(config, a.etapaDe)?.nome : undefined;
+              const de = a.etapaDe ? (etapaPorId(config, a.etapaDe)?.nome ?? nomeEtapaRemovida(a.etapaDe)) : undefined;
               const para = a.etapaPara ? etapaPorId(config, a.etapaPara) : undefined;
+              const nomePara = para?.nome ?? (a.etapaPara ? nomeEtapaRemovida(a.etapaPara) : undefined);
               const removivel = a.tipo === 'nota' || a.tipo === 'ligacao' || a.tipo === 'whatsapp';
               return (
                 <li key={a.id} className="group relative">
@@ -66,7 +72,7 @@ export function Timeline({ atividades, motivoPerda }: { atividades: Atividade[];
                         <span className="font-medium">
                           {a.tipo === 'etapa' ? (
                             <>
-                              {de ?? '—'} <ArrowRight className="inline h-3 w-3" /> {para?.nome ?? '—'}
+                              {de ?? '—'} <ArrowRight className="inline h-3 w-3" /> {nomePara ?? '—'}
                             </>
                           ) : (
                             meta.titulo

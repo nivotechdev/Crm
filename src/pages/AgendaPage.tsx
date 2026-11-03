@@ -13,10 +13,10 @@ import { Segmented } from '../components/ui/Segmented';
 import { PageHeader } from '../components/layout/PageHeader';
 import { TaskItem } from '../components/agenda/TaskItem';
 
-type Aba = 'hoje' | 'atrasados' | 'semana' | 'concluidas';
+type Aba = 'hoje' | 'atrasados' | 'semana';
 
 export default function AgendaPage() {
-  const { tarefas, excluirTarefa } = useData();
+  const { excluirTarefa } = useData();
   const { confirmar, abrirAgendamento } = useAcoes();
   const toast = useToast();
   const now = useNow();
@@ -26,19 +26,15 @@ export default function AgendaPage() {
   const fimSemana = endOfDay(addDays(now, 6)).toISOString();
   const inicioHoje = startOfDay(now).toISOString();
   const semana = useMemo(() => d.pendentes.filter((t) => t.dataHora >= inicioHoje && t.dataHora <= fimSemana), [d.pendentes, inicioHoje, fimSemana]);
-  const concluidas = useMemo(
-    () => tarefas.filter((t) => t.concluida).sort((a, b) => (b.concluidaEm ?? '').localeCompare(a.concluidaEm ?? '')).slice(0, 50),
-    [tarefas],
-  );
 
   const excluir = async (id: string) => {
-    if (await confirmar({ titulo: 'Excluir esta tarefa?', confirmarLabel: 'Excluir', perigo: true })) {
+    if (await confirmar({ titulo: 'Excluir este compromisso?', confirmarLabel: 'Excluir', perigo: true })) {
       await excluirTarefa(id);
       toast('Tarefa excluída', { tipo: 'info' });
     }
   };
 
-  const lista = aba === 'hoje' ? d.tarefasHoje : aba === 'atrasados' ? d.tarefasAtrasadas : aba === 'semana' ? semana : concluidas;
+  const lista = aba === 'hoje' ? d.tarefasHoje : aba === 'atrasados' ? d.tarefasAtrasadas : semana;
 
   // agrupar por dia na visão semanal
   const grupos = useMemo(() => {
@@ -58,7 +54,7 @@ export default function AgendaPage() {
         subtitulo="Retornos, reuniões e tarefas"
         acoes={
           <Button variante="primario" icone={<Plus className="h-4 w-4" />} onClick={() => abrirAgendamento({ tipo: 'reuniao' })}>
-            Nova tarefa
+            Nova reunião
           </Button>
         }
       />
@@ -70,7 +66,6 @@ export default function AgendaPage() {
           { value: 'atrasados', label: 'Atrasados', contador: d.tarefasAtrasadas.length },
           { value: 'hoje', label: 'Hoje', contador: d.tarefasHoje.length },
           { value: 'semana', label: '7 dias', contador: semana.length },
-          { value: 'concluidas', label: 'Concluídas' },
         ]}
       />
       <Card>
@@ -80,9 +75,9 @@ export default function AgendaPage() {
           ) : (
             <EmptyState
               icone={<CalendarX className="h-6 w-6" />}
-              titulo={aba === 'concluidas' ? 'Nenhuma tarefa concluída ainda' : 'Nada agendado'}
+              titulo="Nada agendado"
               descricao="Agende reuniões pelo botão de calendário no card do lead, ou retornos pelo popup após cada contato."
-              acao={aba !== 'concluidas' && <Button onClick={() => abrirAgendamento({ tipo: 'reuniao' })}>Agendar agora</Button>}
+              acao={<Button onClick={() => abrirAgendamento({ tipo: 'reuniao' })}>Agendar reunião</Button>}
             />
           )
         ) : grupos ? (

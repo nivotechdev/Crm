@@ -25,8 +25,8 @@ Em **todas** as listagens (cards de leads, agenda, painel, busca) cada lead most
 - Faixa lateral colorida no card/linha.
 - Botões **📞 Liguei** e **WhatsApp** ao lado: 1 clique registra o contato com data/hora e atualiza a cor na hora. O WhatsApp também abre o `wa.me`.
 - Depois do clique aparece um **mini-popup opcional** (não bloqueia a tela): resultado, observação curta e agendar próximo contato (Amanhã / 2 dias / 1 semana / data). Tem **Desfazer**.
-- Contador no topo: *Contatados hoje X de Y leads ativos*, ligações e WhatsApps do dia e barra da meta.
-- Filtros de 1 clique: Não contatados hoje · Atrasados (7+) · Nunca contatados · Retorno hoje.
+- Meta do dia na tela Início: contatos feitos x meta, ligações e WhatsApps do dia.
+- Os botões de telefone e WhatsApp são links de verdade: `tel:+55…` abre o discador e `https://wa.me/55…` abre o WhatsApp com o número do lead; o mesmo toque registra o contato.
 - Os intervalos das cores são configuráveis em **Configurações**.
 
 ## Navegação
@@ -47,10 +47,10 @@ Menu único (`src/components/nav/AppNav.tsx`), com as mesmas 3 abas nos dois tam
 
 | Rota | Tela |
 |---|---|
-| `/` | **Início** — meta do dia (editável no lápis), botão de Configurações, agendar, retornos de hoje/atrasados, leads atrasados, funil com conversão, vendas do mês, assembleias e indicações, e a seção **Relatórios** (contatos por dia/semana, motivos de perda, origem que mais converte, volume por mês) |
+| `/` | **Início** — meta do dia (editável no lápis), botão de Configurações, agendar, retornos de hoje/atrasados, vendas do mês, assembleias e indicações, e a seção **Relatórios** (contatos por dia/semana, motivos de perda, origem que mais converte, volume por mês) |
 | `/leads` | **Leads = funil** — cards (2 colunas no celular, até 5 no desktop). Seletor de etapa: cada etapa é uma tela (`?etapa=<id>`), além de "Todas". No card: etapa, Liguei, WhatsApp e **Agendar reunião**. "Perdido" pede o motivo; "Ganho" vira cliente |
 | `/leads/:id` | **Ficha** — Ligar / WhatsApp (com modelos) / Registrar contato, etapas em 1 clique, próximo passo, edição inline, linha do tempo e simulador |
-| `/agenda` | **Agenda** — atrasados, hoje, 7 dias, concluídas; check rápido. "Nova tarefa" abre o card de agendamento: busca do lead, tipo, formato (presencial/vídeo/telefone), data, horário, local/link, aviso de conflito e confirmação pelo WhatsApp |
+| `/agenda` | **Agenda** — atrasados, hoje e 7 dias; check rápido. "Nova reunião" abre o card de agendamento (só **reunião** ou **retorno**): busca do lead, formato (presencial/vídeo/telefone), data, horário, local/link, aviso de conflito e confirmação pelo WhatsApp |
 | `/clientes` | **Pós-venda** (pelo card Pós-venda do Início ou pelo menu da conta no computador) — administradora, grupo, cota, assembleia, lance; alertas de assembleia e de pedir indicação |
 | `/configuracoes` | Aberta pelo botão na tela inicial (ou `G S`). Meta diária, cores, etapas, origens, modelos de WhatsApp (`{nome}`, `{primeiroNome}`, `{valor}`, `{objetivo}`, `{cidade}`, `{vendedor}`), tema, backup |
 
@@ -98,11 +98,6 @@ supabase/schema.sql  esquema sugerido (tabelas, enums, índices, trigger, RLS)
 
 **Regra de ouro:** telas nunca acessam `localStorage` — só chamam `useData()`, que chama os services.
 Para trocar de banco, reescreva o corpo das funções em `src/services/*` mantendo as assinaturas.
-
-## Simulação
-
-Calculadora simples: **nenhuma taxa vem pré-preenchida** — você informa valor da carta, prazo, taxa de administração e fundo de reserva da administradora.
-`parcela ≈ crédito × (1 + taxa adm% + fundo reserva%) ÷ prazo`. Sempre exibida como *"Estimativa — confirme no sistema da administradora"*. Não considera seguro, reajustes, lance ou regras do grupo.
 
 ## O que falta para conectar ao banco (Supabase)
 
