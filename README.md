@@ -29,16 +29,29 @@ Em **todas** as listagens (cards de leads, agenda, painel, busca) cada lead most
 - Filtros de 1 clique: Não contatados hoje · Atrasados (7+) · Nunca contatados · Retorno hoje.
 - Os intervalos das cores são configuráveis em **Configurações**.
 
+## Navegação
+
+Menu único (`src/components/nav/AppNav.tsx`), com as mesmas 3 abas nos dois tamanhos; o ponto de corte é **770 px**.
+
+| Aba | Ícone | Rota |
+|---|---|---|
+| Início | casa | `/` (inclui os relatórios) |
+| Leads | pessoas | `/leads` (a ficha `/leads/:id` acende esta aba) |
+| Agenda | calendário | `/agenda` |
+
+- **Celular (< 770 px):** pílula de vidro flutuante embaixo, só nas telas de aba (`TAB_ROOTS` em `AppShell.tsx`).
+- **Computador (≥ 770 px):** barra do topo em "ilha" com logo, abas com sublinhado deslizante, sino de avisos (atrasados, compromissos de hoje e assembleias da semana) e menu da conta (Configurações · Clientes · Notificações · Atalhos e ajuda). Vira vidro ao rolar a página.
+- Dados das abas e do menu: `navItems.ts` e `accountMenu.ts`.
+
 ## Telas
 
 | Rota | Tela |
 |---|---|
-| `/` | **Início** — meta do dia (editável no lápis), botão de Configurações, agendar, retornos de hoje/atrasados, leads atrasados, funil com conversão, vendas do mês, assembleias e indicações |
+| `/` | **Início** — meta do dia (editável no lápis), botão de Configurações, agendar, retornos de hoje/atrasados, leads atrasados, funil com conversão, vendas do mês, assembleias e indicações, e a seção **Relatórios** (contatos por dia/semana, motivos de perda, origem que mais converte, volume por mês) |
 | `/leads` | **Leads = funil** — cards (2 colunas no celular, até 5 no desktop). Seletor de etapa: cada etapa é uma tela (`?etapa=<id>`), além de "Todas". No card: etapa, Liguei, WhatsApp e **Agendar reunião**. "Perdido" pede o motivo; "Ganho" vira cliente |
 | `/leads/:id` | **Ficha** — Ligar / WhatsApp (com modelos) / Registrar contato, etapas em 1 clique, próximo passo, edição inline, linha do tempo e simulador |
 | `/agenda` | **Agenda** — atrasados, hoje, 7 dias, concluídas; check rápido. "Nova tarefa" abre o card de agendamento: busca do lead, tipo, formato (presencial/vídeo/telefone), data, horário, local/link, aviso de conflito e confirmação pelo WhatsApp |
-| `/clientes` | **Pós-venda** — administradora, grupo, cota, assembleia, lance; alertas de assembleia e de pedir indicação |
-| `/relatorios` | Contatos por dia/semana, conversão por etapa, motivos de perda, origem que mais converte, volume por mês |
+| `/clientes` | **Pós-venda** (pelo card Pós-venda do Início ou pelo menu da conta no computador) — administradora, grupo, cota, assembleia, lance; alertas de assembleia e de pedir indicação |
 | `/configuracoes` | Aberta pelo botão na tela inicial (ou `G S`). Meta diária, cores, etapas, origens, modelos de WhatsApp (`{nome}`, `{primeiroNome}`, `{valor}`, `{objetivo}`, `{cidade}`, `{vendedor}`), tema, backup |
 
 ## Atalhos de teclado
@@ -48,7 +61,7 @@ Em **todas** as listagens (cards de leads, agenda, painel, busca) cada lead most
 | `Ctrl K` ou `/` | Busca global (nome, telefone, cidade, etiqueta) |
 | `N` | Novo lead (só nome + telefone obrigatórios; `Enter` salva) |
 | `M` | Agendar reunião (na ficha, já com o lead) |
-| `G` + `D/L/A/C/R/S` | Ir para Início / Leads / Agenda / Clientes / Relatórios / Configurações |
+| `G` + `D/L/A/C/R/S` | Ir para Início / Leads / Agenda / Clientes / Relatórios (no Início) / Configurações |
 | `[` `]` | Etapa anterior / próxima (em Leads) |
 | `J` `K` (ou setas) | Navegar entre os cards de leads |
 | `L` / `W` | Registrar ligação / abrir WhatsApp no lead selecionado (lista) ou aberto (ficha) |
@@ -73,11 +86,12 @@ src/
 ├─ hooks/            useDerivados (contadores do dia), useHotkeys
 ├─ components/
 │  ├─ ui/            Button, Modal/Sheet, Field, Inline*, Chip, Charts…
-│  ├─ layout/        Sidebar, BottomNav, Topbar, CommandPalette, DailyCounter
+│  ├─ nav/           AppNav (pílula do celular), TopBar (ilha do computador), navItems, accountMenu
+│  ├─ layout/        AppShell, CommandPalette, DailyCounter, PageHeader
 │  ├─ leads/         LastContactBadge, QuickContactButtons, StageSwitcher, ContactOutcomeSheet,
 │  │                 NewLeadModal, LostReasonModal, WonModal, Timeline, Simulator
 │  ├─ agenda/        TaskItem, ScheduleModal (card de agendamento)
-│  └─ dashboard/     MetaModal (edição rápida da meta)
+│  └─ dashboard/     MetaModal (edição rápida da meta), RelatoriosSecao
 └─ pages/            uma por tela
 supabase/schema.sql  esquema sugerido (tabelas, enums, índices, trigger, RLS)
 ```
