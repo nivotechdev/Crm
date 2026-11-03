@@ -5,6 +5,8 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
+      // Ponto de corte celular/computador do menu: abaixo de 770 px = celular
+      screens: { lg: '770px' },
       fontFamily: {
         sans: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
       },
@@ -22,6 +24,8 @@ export default {
         card: '0 1px 2px rgba(28,25,22,0.04), 0 1px 1px rgba(28,25,22,0.03)',
         lift: '0 8px 24px -8px rgba(28,25,22,0.14), 0 2px 6px -2px rgba(28,25,22,0.06)',
         pop: '0 20px 48px -12px rgba(28,25,22,0.28)',
+        raised: '0 6px 14px -4px rgba(238,74,6,0.45), 0 1px 2px rgba(28,25,22,0.08)',
+        float: '0 18px 40px -12px rgba(28,25,22,0.22), 0 0 0 1px rgba(28,25,22,0.04)',
       },
       keyframes: {
         'slide-up': { from: { transform: 'translateY(12px)', opacity: '0' }, to: { transform: 'translateY(0)', opacity: '1' } },
