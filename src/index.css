@@ -60,6 +60,54 @@ html.light:root {
 }
 
 @layer components {
+  /* Laterais da barra do topo = laterais das páginas */
+  .page-x {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+  @media (min-width: 1128px) {
+    .page-x {
+      padding-left: 2.5rem;
+      padding-right: 2.5rem;
+    }
+  }
+  @media (min-width: 1440px) {
+    .page-x {
+      padding-left: 5rem;
+      padding-right: 5rem;
+    }
+  }
+
+  /* Ilha do topo: "chapada" no topo da página, vidro flutuante ao rolar */
+  .app-island {
+    border: 1px solid transparent;
+    background: rgb(var(--c-surface) / 0);
+    -webkit-backdrop-filter: blur(0) saturate(1);
+    backdrop-filter: blur(0) saturate(1);
+    box-shadow: 0 0 0 0 rgba(16, 20, 24, 0), 0 0 rgba(16, 20, 24, 0);
+    transform: translateY(0);
+    transition:
+      background-color 320ms ease,
+      border-color 320ms ease,
+      box-shadow 320ms ease,
+      backdrop-filter 320ms ease,
+      -webkit-backdrop-filter 320ms ease,
+      transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .app-header.is-scrolled .app-island {
+    background: rgb(var(--c-surface) / 0.78);
+    border-color: rgb(var(--c-surface) / 0.7);
+    -webkit-backdrop-filter: blur(18px) saturate(1.8);
+    backdrop-filter: blur(18px) saturate(1.8);
+    box-shadow: 0 0 0 1px rgba(16, 20, 24, 0.07), 0 12px 36px rgba(16, 20, 24, 0.14);
+    transform: translateY(2px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .app-island {
+      transition: none;
+    }
+  }
+
   /* Vidro da pílula do celular (= ilha do topo rolada) */
   .app-glass {
     background: rgb(var(--c-surface) / 0.78);
