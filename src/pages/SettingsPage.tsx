@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowDown, ArrowUp, Download, Minus, Plus, RotateCcw, Trash2, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ArrowDown, ArrowLeft, ArrowUp, Download, Minus, Plus, RotateCcw, Trash2, X } from 'lucide-react';
 import type { Configuracoes, Etapa, ModeloMensagem, NivelContato } from '../types';
 import { useData } from '../store/DataContext';
 import { useAcoes } from '../store/AcoesContext';
@@ -77,17 +78,46 @@ export default function SettingsPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-5 md:px-8 md:py-8">
-      <PageHeader titulo="Configurações" />
+      <PageHeader
+        titulo="Configurações"
+        subtitulo="Meta, funil, mensagens e aparência"
+        acoes={
+          <Link to="/" className="hidden sm:block">
+            <Button icone={<ArrowLeft className="h-4 w-4" />}>Início</Button>
+          </Link>
+        }
+      />
 
       <div className="space-y-4">
+        <Card id="meta">
+          <CardHeader titulo="Meta diária de contatos" subtitulo="Soma de ligações e WhatsApps registrados no dia" />
+          <div className="flex flex-col gap-4 px-5 pb-6 sm:flex-row sm:items-center sm:justify-between">
+            <Stepper valor={cfg.metaDiaria} min={1} max={500} passo={5} rotulo="Meta diária de contatos" onChange={(v) => set('metaDiaria', v)} />
+            <div className="flex flex-wrap gap-2">
+              {[20, 30, 40, 50, 60].map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => set('metaDiaria', v)}
+                  className={cn(
+                    'num h-9 rounded-full border px-4 text-[13px] font-medium transition-colors',
+                    cfg.metaDiaria === v
+                      ? 'border-slate-900 bg-slate-900 text-white dark:border-white dark:bg-white dark:text-slate-900'
+                      : 'border-slate-200 text-slate-600 hover:border-slate-300 dark:border-slate-700 dark:text-slate-300',
+                  )}
+                >
+                  {v}
+                </button>
+              ))}
+            </div>
+          </div>
+        </Card>
+
         <Card>
-          <CardHeader titulo="Perfil e meta" />
-          <div className="grid gap-4 px-4 pb-5 sm:grid-cols-2 sm:px-5">
+          <CardHeader titulo="Perfil" />
+          <div className="grid gap-4 px-5 pb-6">
             <Field label="Seu nome (usado em {vendedor} nas mensagens)">
               <Input value={cfg.nomeVendedor} placeholder="Seu nome" onChange={(e) => set('nomeVendedor', e.target.value)} />
-            </Field>
-            <Field label="Meta diária de contatos (ligações + WhatsApps)">
-              <Stepper valor={cfg.metaDiaria} min={1} max={500} onChange={(v) => set('metaDiaria', v)} />
             </Field>
             <label className="flex items-center gap-3 text-sm sm:col-span-2">
               <input type="checkbox" className="h-4 w-4 accent-brand-600" checked={cfg.autoAvancarLeadNovo} onChange={(e) => set('autoAvancarLeadNovo', e.target.checked)} />
@@ -276,15 +306,15 @@ export default function SettingsPage() {
   );
 }
 
-function Stepper({ valor, onChange, min, max }: { valor: number; onChange: (v: number) => void; min: number; max: number }) {
+function Stepper({ valor, onChange, min, max, passo = 1, rotulo }: { valor: number; onChange: (v: number) => void; min: number; max: number; passo?: number; rotulo?: string }) {
   const clamp = (v: number) => Math.max(min, Math.min(max, v));
   return (
     <div className="flex items-center gap-2">
-      <IconButton label="Diminuir" className="ring-1 ring-slate-300 dark:ring-slate-600" onClick={() => onChange(clamp(valor - 1))}>
+      <IconButton label="Diminuir" className="border border-slate-200 dark:border-slate-700" onClick={() => onChange(clamp(valor - passo))}>
         <Minus className="h-4 w-4" />
       </IconButton>
-      <Input type="number" value={valor} min={min} max={max} onChange={(e) => onChange(clamp(Number(e.target.value) || min))} className="w-20 text-center tabular-nums" />
-      <IconButton label="Aumentar" className="ring-1 ring-slate-300 dark:ring-slate-600" onClick={() => onChange(clamp(valor + 1))}>
+      <Input type="number" aria-label={rotulo} value={valor} min={min} max={max} onChange={(e) => onChange(clamp(Number(e.target.value) || min))} className="num w-20 rounded-full text-center text-base font-semibold" />
+      <IconButton label="Aumentar" className="border border-slate-200 dark:border-slate-700" onClick={() => onChange(clamp(valor + passo))}>
         <Plus className="h-4 w-4" />
       </IconButton>
     </div>

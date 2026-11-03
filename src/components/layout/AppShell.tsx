@@ -1,4 +1,4 @@
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import { useAcoes } from '../../store/AcoesContext';
 import { useHotkeys } from '../../hooks/useHotkeys';
@@ -9,7 +9,8 @@ import { CommandPalette } from './CommandPalette';
 import { ShortcutsHelp } from './ShortcutsHelp';
 
 export function AppShell() {
-  const { abrirNovoLead, setBuscaAberta, buscaAberta, setAtalhosAbertos } = useAcoes();
+  const { abrirNovoLead, abrirAgendamento, setBuscaAberta, buscaAberta, setAtalhosAbertos } = useAcoes();
+  const { pathname } = useLocation();
   const navigate = useNavigate();
   const modalAberto = () => !!document.querySelector('[role=dialog][aria-modal=true]');
 
@@ -21,8 +22,11 @@ export function AppShell() {
     '?': () => setAtalhosAbertos(true),
     'g d': () => navigate('/'),
     'g l': () => navigate('/leads'),
-    'g f': () => navigate('/funil'),
-    'g k': () => navigate('/funil'),
+    m: () => {
+      if (modalAberto()) return;
+      const id = pathname.match(/^\/leads\/([^/]+)$/)?.[1];
+      abrirAgendamento(id ? { leadId: id, tipo: 'reuniao' } : { tipo: 'reuniao' });
+    },
     'g a': () => navigate('/agenda'),
     'g c': () => navigate('/clientes'),
     'g r': () => navigate('/relatorios'),

@@ -1,4 +1,4 @@
-import { Phone } from 'lucide-react';
+import { CalendarPlus, Phone } from 'lucide-react';
 import type { Lead } from '../../types';
 import { useAcoes } from '../../store/AcoesContext';
 import { cn } from '../../lib/cn';
@@ -16,14 +16,17 @@ export function QuickContactButtons({
   className,
   soIcone,
   bloco,
+  agendar,
 }: {
   lead: Lead;
   tamanho?: 'sm' | 'md';
   className?: string;
   soIcone?: boolean;
   bloco?: boolean;
+  /** Mostra também o botão de agendar reunião. */
+  agendar?: boolean;
 }) {
-  const { contatoRapido } = useAcoes();
+  const { contatoRapido, abrirAgendamento } = useAcoes();
   const base =
     'inline-flex items-center justify-center gap-1.5 rounded-full font-semibold transition-all active:scale-[.96] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500';
   const tam = tamanho === 'sm' ? 'h-8 text-xs' : 'h-10 text-[13px]';
@@ -50,6 +53,18 @@ export function QuickContactButtons({
         <WhatsAppIcon className="h-4 w-4 shrink-0" />
         {!soIcone && !bloco && <span>WhatsApp</span>}
       </button>
+      {agendar && (
+        <button
+          type="button"
+          title="Agendar reunião"
+          aria-label={`Agendar reunião com ${lead.nome}`}
+          onClick={() => abrirAgendamento({ leadId: lead.id, tipo: 'reuniao' })}
+          className={cn(base, tam, larg, 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700')}
+        >
+          <CalendarPlus className="h-4 w-4 shrink-0" />
+          {!soIcone && !bloco && <span>Agendar</span>}
+        </button>
+      )}
     </div>
   );
 }

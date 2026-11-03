@@ -65,6 +65,7 @@ export function NewLeadModal({ aberto, onFechar, prefill }: { aberto: boolean; o
         cidade: f.cidade || undefined,
         temperatura: f.temperatura,
         observacoes: f.observacoes || undefined,
+        etapaId: prefill?.etapaId,
       });
       toast(`Lead "${lead.nome}" criado`);
       if (depois === 'outro') {
@@ -86,7 +87,7 @@ export function NewLeadModal({ aberto, onFechar, prefill }: { aberto: boolean; o
       aberto={aberto}
       onFechar={onFechar}
       titulo="Novo lead"
-      subtitulo="Só nome e telefone são obrigatórios"
+      subtitulo={prefill?.etapaId ? `Entra em “${config.etapas.find((e) => e.id === prefill.etapaId)?.nome}” · só nome e telefone são obrigatórios` : 'Só nome e telefone são obrigatórios'}
       rodape={
         <>
           <Button variante="fantasma" className="mr-auto hidden sm:inline-flex" onClick={() => salvar('outro')} disabled={salvando}>

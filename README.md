@@ -11,7 +11,7 @@ npm run build      # gera /dist (estático, pode subir em qualquer hospedagem)
 
 ## O diferencial: indicador de último contato
 
-Em **todas** as listagens (lista, funil, agenda, painel, busca) cada lead mostra, sem abrir:
+Em **todas** as listagens (cards de leads, agenda, painel, busca) cada lead mostra, sem abrir:
 
 | Cor | Padrão | Significado |
 |---|---|---|
@@ -33,14 +33,13 @@ Em **todas** as listagens (lista, funil, agenda, painel, busca) cada lead mostra
 
 | Rota | Tela |
 |---|---|
-| `/` | **Painel** — meta do dia, retornos de hoje/atrasados, leads atrasados, funil com conversão, vendas do mês, assembleias e indicações |
-| `/leads` | **Lista** — ordenada por quem está há mais tempo sem contato; filtros, busca, ações em massa (etapa, temperatura, etiqueta, excluir) |
-| `/funil` | **Kanban** — arrastar e soltar (no celular: segurar e arrastar, ou seletor de etapa). "Perdido" pede o motivo; "Ganho" vira cliente |
+| `/` | **Início** — meta do dia (editável no lápis), botão de Configurações, agendar, retornos de hoje/atrasados, leads atrasados, funil com conversão, vendas do mês, assembleias e indicações |
+| `/leads` | **Leads = funil** — cards (2 colunas no celular, até 5 no desktop). Seletor de etapa: cada etapa é uma tela (`?etapa=<id>`), além de "Todas". No card: etapa, Liguei, WhatsApp e **Agendar reunião**. "Perdido" pede o motivo; "Ganho" vira cliente |
 | `/leads/:id` | **Ficha** — Ligar / WhatsApp (com modelos) / Registrar contato, etapas em 1 clique, próximo passo, edição inline, linha do tempo e simulador |
-| `/agenda` | **Agenda** — atrasados, hoje, 7 dias, concluídas; check rápido |
+| `/agenda` | **Agenda** — atrasados, hoje, 7 dias, concluídas; check rápido. "Nova tarefa" abre o card de agendamento: busca do lead, tipo, formato (presencial/vídeo/telefone), data, horário, local/link, aviso de conflito e confirmação pelo WhatsApp |
 | `/clientes` | **Pós-venda** — administradora, grupo, cota, assembleia, lance; alertas de assembleia e de pedir indicação |
 | `/relatorios` | Contatos por dia/semana, conversão por etapa, motivos de perda, origem que mais converte, volume por mês |
-| `/configuracoes` | Meta, cores, etapas, origens, modelos de WhatsApp (`{nome}`, `{primeiroNome}`, `{valor}`, `{objetivo}`, `{cidade}`, `{vendedor}`), tema, backup |
+| `/configuracoes` | Aberta pelo botão na tela inicial (ou `G S`). Meta diária, cores, etapas, origens, modelos de WhatsApp (`{nome}`, `{primeiroNome}`, `{valor}`, `{objetivo}`, `{cidade}`, `{vendedor}`), tema, backup |
 
 ## Atalhos de teclado
 
@@ -48,8 +47,10 @@ Em **todas** as listagens (lista, funil, agenda, painel, busca) cada lead mostra
 |---|---|
 | `Ctrl K` ou `/` | Busca global (nome, telefone, cidade, etiqueta) |
 | `N` | Novo lead (só nome + telefone obrigatórios; `Enter` salva) |
-| `G` + `D/L/F/A/C/R/S` | Ir para Painel / Leads / Funil / Agenda / Clientes / Relatórios / Configurações |
-| `J` `K` (ou ↓ ↑) | Navegar na lista de leads |
+| `M` | Agendar reunião (na ficha, já com o lead) |
+| `G` + `D/L/A/C/R/S` | Ir para Início / Leads / Agenda / Clientes / Relatórios / Configurações |
+| `[` `]` | Etapa anterior / próxima (em Leads) |
+| `J` `K` (ou setas) | Navegar entre os cards de leads |
 | `L` / `W` | Registrar ligação / abrir WhatsApp no lead selecionado (lista) ou aberto (ficha) |
 | `X` | Selecionar lead para ação em massa |
 | `A` | Nova anotação (ficha) |
@@ -73,9 +74,10 @@ src/
 ├─ components/
 │  ├─ ui/            Button, Modal/Sheet, Field, Inline*, Chip, Charts…
 │  ├─ layout/        Sidebar, BottomNav, Topbar, CommandPalette, DailyCounter
-│  ├─ leads/         LastContactBadge, QuickContactButtons, ContactOutcomeSheet,
+│  ├─ leads/         LastContactBadge, QuickContactButtons, StageSwitcher, ContactOutcomeSheet,
 │  │                 NewLeadModal, LostReasonModal, WonModal, Timeline, Simulator
-│  └─ agenda/        TaskItem
+│  ├─ agenda/        TaskItem, ScheduleModal (card de agendamento)
+│  └─ dashboard/     MetaModal (edição rápida da meta)
 └─ pages/            uma por tela
 supabase/schema.sql  esquema sugerido (tabelas, enums, índices, trigger, RLS)
 ```
@@ -113,6 +115,6 @@ Calculadora simples: **nenhuma taxa vem pré-preenchida** — você informa valo
 | `modelos_mensagem` | id, user_id, nome, texto |
 | `leads` | id, user_id, nome, telefone, email, cidade, origem, indicado_por, objetivo, valor_carta, parcela_ideal, recurso_lance, valor_lance, prazo_uso_credito, urgencia, ja_teve_consorcio, decisor_junto, objecao_principal, temperatura, etiquetas[], observacoes, etapa_id → etapas, motivo_perda, motivo_perda_detalhe, **ultimo_contato_em**, **ultimo_contato_canal**, criado_em, atualizado_em |
 | `atividades` | id, user_id, lead_id → leads, tipo (`ligacao`/`whatsapp`/`nota`/`etapa`/`simulacao`/`sistema`), resultado, observacao, etapa_de, etapa_para, simulacao_id, criado_em |
-| `tarefas` | id, user_id, titulo, tipo, data_hora, dia_inteiro, lead_id, cliente_id, concluida, concluida_em, criado_em |
+| `tarefas` | id, user_id, titulo, tipo, data_hora, dia_inteiro, formato (presencial/video/telefone), local, lead_id, cliente_id, concluida, concluida_em, criado_em |
 | `clientes` | id, user_id, lead_id, nome, telefone, administradora, grupo, cota, tipo_bem, valor_carta, prazo_meses, data_venda, status, proxima_assembleia, pretende_lance, valor_lance, indicacao_pedida_em, observacoes |
 | `simulacoes` | id, user_id, lead_id, valor_carta, prazo_meses, taxa_adm_pct, fundo_reserva_pct, parcela_estimada, criado_em |

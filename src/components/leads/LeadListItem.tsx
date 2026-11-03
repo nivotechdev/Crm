@@ -115,7 +115,7 @@ export const LeadCard = memo(function LeadCard({ lead, proxima, selecionado, foc
 
       <div className="flex flex-col gap-2 border-t border-slate-100 py-2.5 pl-4 pr-3 dark:border-slate-800 sm:pl-[18px]">
         <EtapaSelect lead={lead} />
-        <QuickContactButtons lead={lead} tamanho="sm" bloco />
+        <QuickContactButtons lead={lead} tamanho="sm" bloco agendar />
       </div>
     </article>
   );

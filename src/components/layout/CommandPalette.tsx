@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CornerDownLeft, Plus, Search, UserCheck } from 'lucide-react';
+import { CalendarPlus, CornerDownLeft, Plus, Search, UserCheck } from 'lucide-react';
 import { useData } from '../../store/DataContext';
 import { useAcoes } from '../../store/AcoesContext';
 import { formatTelefone, normalizarBusca, somenteDigitos } from '../../lib/format';
 import { cn } from '../../lib/cn';
-import { NAV } from './nav';
+import { NAV, NAV_CONFIG } from './nav';
 import { Avatar } from '../ui/Avatar';
 import { LastContactBadge } from '../leads/LastContactBadge';
 import { EtapaBadge } from '../leads/Badges';
@@ -19,7 +19,7 @@ type Item =
 
 /** Busca global instantânea (Ctrl+K ou "/"). */
 export function CommandPalette() {
-  const { buscaAberta, setBuscaAberta, abrirNovoLead } = useAcoes();
+  const { buscaAberta, setBuscaAberta, abrirNovoLead, abrirAgendamento } = useAcoes();
   const { leads, clientes } = useData();
   const navigate = useNavigate();
   const [q, setQ] = useState('');
@@ -62,7 +62,8 @@ export function CommandPalette() {
         icone: Plus,
         run: () => abrirNovoLead(dig.length >= 10 ? { telefone: dig } : !dig && termo ? { nome: q.trim() } : undefined),
       },
-      ...NAV.filter((n) => !termo || normalizarBusca(n.label).includes(termo)).map((n) => ({
+      { tipo: 'cmd' as const, label: 'Agendar reunião', icone: CalendarPlus, run: () => abrirAgendamento({ tipo: 'reuniao' }) },
+      ...[...NAV, NAV_CONFIG].filter((n) => !termo || normalizarBusca(n.label).includes(termo)).map((n) => ({
         tipo: 'cmd' as const,
         label: `Ir para ${n.label}`,
         icone: n.icone,
@@ -70,7 +71,7 @@ export function CommandPalette() {
       })),
     ];
     return [...ls, ...cs, ...cmds];
-  }, [q, leads, clientes, navigate, abrirNovoLead]);
+  }, [q, leads, clientes, navigate, abrirNovoLead, abrirAgendamento]);
 
   useEffect(() => setSel(0), [q]);
   useEffect(() => {

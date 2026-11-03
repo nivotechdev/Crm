@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState, type ReactNode } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Check, ChevronDown, ClipboardEdit, Phone, Send, Trash2 } from 'lucide-react';
+import { ArrowLeft, CalendarPlus, Check, ChevronDown, ClipboardEdit, Phone, Send, Trash2 } from 'lucide-react';
 import type { Lead, Temperatura } from '../types';
 import { useData } from '../store/DataContext';
 import { useAcoes } from '../store/AcoesContext';
@@ -9,7 +9,7 @@ import { useNow } from '../store/NowContext';
 import { useHotkeys } from '../hooks/useHotkeys';
 import { formatData, formatHora, fromInputDate, tempoRelativoAgenda } from '../lib/dates';
 import { formatTelefone } from '../lib/format';
-import { MOTIVOS_PERDA, OBJETIVOS, SIM_NAO_TALVEZ, TEMPERATURAS, URGENCIAS, opcoes } from '../lib/labels';
+import { FORMATOS_REUNIAO, MOTIVOS_PERDA, OBJETIVOS, SIM_NAO_TALVEZ, TEMPERATURAS, URGENCIAS, opcoes } from '../lib/labels';
 import { ATALHOS_AGENDA, dataDaquiA } from '../lib/agendamento';
 import { linkTelefone, preencherModelo } from '../lib/whatsapp';
 import { cn } from '../lib/cn';
@@ -43,7 +43,7 @@ export default function LeadDetailPage() {
 
 function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<ReturnType<typeof useData>, 'atividades' | 'tarefas' | 'config'>) {
   const { atualizarLead, adicionarNota, alternarTarefa, agendarRetorno, excluirLeads, leads } = useData();
-  const { contatoRapido, pedirMoverEtapa, confirmar } = useAcoes();
+  const { contatoRapido, pedirMoverEtapa, confirmar, abrirAgendamento } = useAcoes();
   const toast = useToast();
   const now = useNow();
   const navigate = useNavigate();
@@ -270,7 +270,14 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
 
       {/* Próximo passo */}
       <Card className="mb-4">
-        <CardHeader titulo="Próximo passo" />
+        <CardHeader
+          titulo="Próximo passo"
+          acao={
+            <Button tamanho="sm" variante="primario" icone={<CalendarPlus className="h-4 w-4" />} onClick={() => abrirAgendamento({ leadId: lead.id, tipo: 'reuniao' })}>
+              Agendar reunião
+            </Button>
+          }
+        />
         <div className="px-5 pb-5">
           {pendentes.length > 0 ? (
             <ul className="mb-3 space-y-1.5">
@@ -290,6 +297,7 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
                       <p className={cn('text-xs', atrasada ? 'font-semibold text-red-600 dark:text-red-400' : 'text-slate-500')}>
                         {tempoRelativoAgenda(t.dataHora, now)} · {formatData(t.dataHora, { ano: false })}
                         {!t.diaInteiro && ` às ${formatHora(t.dataHora)}`}
+                        {t.formato && ` · ${FORMATOS_REUNIAO[t.formato].toLowerCase()}`}
                       </p>
                     </div>
                   </li>
@@ -297,7 +305,7 @@ function Ficha({ lead, atividades, tarefas, config }: { lead: Lead } & Pick<Retu
               })}
             </ul>
           ) : (
-            <p className="mb-3 text-sm text-slate-500">Nenhum retorno agendado.</p>
+            <p className="mb-3 text-sm text-slate-500">Nada agendado com este lead.</p>
           )}
           <div className="flex flex-wrap items-center gap-1.5">
             <span className="mr-1 text-xs text-slate-500">Agendar retorno:</span>

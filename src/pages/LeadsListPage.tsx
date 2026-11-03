@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { CheckSquare, Columns3, Plus, Search, SlidersHorizontal, Tag, Trash2, Users, X } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { CheckSquare, Plus, Search, SlidersHorizontal, Tag, Trash2, Users, X } from 'lucide-react';
 import type { Objetivo, Temperatura } from '../types';
 import { useData } from '../store/DataContext';
 import { useAcoes } from '../store/AcoesContext';
@@ -18,6 +18,8 @@ import { Select, inputBase } from '../components/ui/Field';
 import { EmptyState } from '../components/ui/EmptyState';
 import { LeadCard } from '../components/leads/LeadListItem';
 import { PageHeader } from '../components/layout/PageHeader';
+import { StageSwitcher, type ResumoEtapa } from '../components/leads/StageSwitcher';
+import { formatBRLCompacto } from '../lib/format';
 
 const selectEscuro =
   'select-chevron h-9 rounded-full border-0 bg-white/10 pl-3 pr-7 text-[13px] font-medium text-white focus:outline-none focus:ring-2 focus:ring-white/40 [&>option]:text-slate-900';
@@ -40,9 +42,21 @@ export default function LeadsListPage() {
     setParams(p, { replace: true });
   };
 
+  // Cada etapa do funil é uma "tela" (?etapa=<id>); vazio = todas as ativas
+  const etapa = params.get('etapa') ?? '';
+  const setEtapa = (id: string) => {
+    const p = new URLSearchParams(params);
+    if (id) p.set('etapa', id);
+    else p.delete('etapa');
+    setParams(p, { replace: true });
+    setFoco(-1);
+    setSelecionados(new Set());
+    window.scrollTo({ top: 0 });
+  };
+  const ordemEtapas = ['', ...config.etapas.map((e) => e.id)];
+
   const [busca, setBusca] = useState('');
   const [ordem, setOrdem] = useState<Ordenacao>(() => prefs.get('lista:ordem', 'sem_contato'));
-  const [etapa, setEtapa] = useState(params.get('etapa') ?? '');
   const [temp, setTemp] = useState<Temperatura | ''>('');
   const [objetivo, setObjetivo] = useState<Objetivo | ''>('');
   const [origem, setOrigem] = useState('');
@@ -58,6 +72,22 @@ export default function LeadsListPage() {
   const ctxFiltro = { retornoHojeIds: d.retornoHojeIds, vermelhoApartirDe: config.laranjaAteDias + 1, now };
 
   const base = useMemo(() => leads.filter((l) => (incluirFechados || etapa ? true : d.isAtivo(l))), [leads, incluirFechados, etapa, d]);
+
+  const resumo = useMemo(() => {
+    const r: Record<string, ResumoEtapa> = { '': { qtd: 0, valor: 0 } };
+    for (const e of config.etapas) r[e.id] = { qtd: 0, valor: 0 };
+    for (const l of leads) {
+      if (r[l.etapaId]) {
+        r[l.etapaId].qtd++;
+        r[l.etapaId].valor += l.valorCarta ?? 0;
+      }
+      if (d.isAtivo(l)) {
+        r[''].qtd++;
+        r[''].valor += l.valorCarta ?? 0;
+      }
+    }
+    return r;
+  }, [leads, config.etapas, d]);
 
   const contagens = useMemo(() => {
     const c = {} as Record<FiltroRapido, number>;
@@ -117,6 +147,14 @@ export default function LeadsListPage() {
     l: () => focado && contatoRapido(focado, 'ligacao'),
     w: () => focado && contatoRapido(focado, 'whatsapp'),
     enter: () => focado && navigate(`/leads/${focado.id}`),
+    '[': () => {
+      const i = ordemEtapas.indexOf(etapa);
+      if (i > 0) setEtapa(ordemEtapas[i - 1]);
+    },
+    ']': () => {
+      const i = ordemEtapas.indexOf(etapa);
+      if (i < ordemEtapas.length - 1) setEtapa(ordemEtapas[i + 1]);
+    },
     x: () => {
       if (!focado) return;
       setModoSelecao(true);
@@ -126,24 +164,26 @@ export default function LeadsListPage() {
 
   const nSel = selecionados.size;
   const ids = [...selecionados];
-  const filtrosAvancados = [etapa, temp, objetivo, origem].filter(Boolean).length + (incluirFechados ? 1 : 0);
+  const filtrosAvancados = [temp, objetivo, origem].filter(Boolean).length + (incluirFechados && !etapa ? 1 : 0);
+  const etapaAtual = config.etapas.find((e) => e.id === etapa);
 
   return (
     <div className="mx-auto max-w-[1400px] px-4 py-5 md:px-8 md:py-8">
       <PageHeader
-        titulo="Leads"
-        subtitulo={`${lista.length} ${lista.length === 1 ? 'lead' : 'leads'}${!incluirFechados && !etapa ? ' ativos' : ''} · ordenados por ${ORDENACOES.find((o) => o.value === ordem)?.label.toLowerCase()}`}
+        titulo={etapaAtual ? etapaAtual.nome : 'Leads'}
+        subtitulo={
+          lista.length === (resumo[etapa]?.qtd ?? -1) || filtro || busca
+            ? `${lista.length} ${lista.length === 1 ? 'lead' : 'leads'} · ${formatBRLCompacto(lista.reduce((s, l) => s + (l.valorCarta ?? 0), 0))} em cartas`
+            : `${lista.length} de ${resumo[etapa]?.qtd ?? 0} leads`
+        }
         acoes={
-          <>
-            <Link to="/funil" className="hidden sm:block">
-              <Button icone={<Columns3 className="h-4 w-4" />}>Funil</Button>
-            </Link>
-            <Button variante="primario" icone={<Plus className="h-4 w-4" />} onClick={() => abrirNovoLead()} className="hidden md:inline-flex">
-              Novo lead
-            </Button>
-          </>
+          <Button variante="primario" icone={<Plus className="h-4 w-4" />} onClick={() => abrirNovoLead(etapaAtual?.tipo === 'aberta' ? { etapaId: etapaAtual.id } : undefined)} className="hidden md:inline-flex">
+            Novo lead
+          </Button>
         }
       />
+
+      <StageSwitcher atual={etapa} resumo={resumo} onChange={setEtapa} />
 
       {/* Busca + controles */}
       <div className="mb-3 flex gap-2">
@@ -198,22 +238,20 @@ export default function LeadsListPage() {
       </div>
 
       {mostrarFiltros && (
-        <div className="mb-5 grid animate-fade-in grid-cols-2 gap-2 rounded-3xl border border-slate-200/70 bg-white p-3 dark:border-slate-800 dark:bg-slate-900 md:grid-cols-3 lg:grid-cols-6">
+        <div className="mb-5 grid animate-fade-in grid-cols-2 gap-2 rounded-3xl border border-slate-200/70 bg-white p-3 dark:border-slate-800 dark:bg-slate-900 md:grid-cols-3 lg:grid-cols-5">
           <div className="col-span-2 sm:hidden">
             <Select value={ordem} onChange={(e) => setOrdem(e.target.value as Ordenacao)} opcoes={ORDENACOES} aria-label="Ordenar por" />
           </div>
-          <Select value={etapa} onChange={(e) => setEtapa(e.target.value)} vazio="Todas as etapas" opcoes={config.etapas.map((e) => ({ value: e.id, label: e.nome }))} aria-label="Etapa" />
           <Select value={temp} onChange={(e) => setTemp(e.target.value as Temperatura)} vazio="Temperatura" opcoes={opcoes(TEMPERATURAS)} aria-label="Temperatura" />
           <Select value={objetivo} onChange={(e) => setObjetivo(e.target.value as Objetivo)} vazio="Objetivo" opcoes={opcoes(OBJETIVOS)} aria-label="Objetivo" />
           <Select value={origem} onChange={(e) => setOrigem(e.target.value)} vazio="Origem" opcoes={config.origens.map((o) => ({ value: o, label: o }))} aria-label="Origem" />
-          <label className="flex items-center gap-2 px-2 text-[13px] text-slate-600 dark:text-slate-300">
+          {!etapa && <label className="flex items-center gap-2 px-2 text-[13px] text-slate-600 dark:text-slate-300">
             <input type="checkbox" checked={incluirFechados} onChange={(e) => setIncluirFechados(e.target.checked)} className="h-4 w-4 accent-brand-600" />
             Ganhos e perdidos
-          </label>
+          </label>}
           <Button
             variante="fantasma"
             onClick={() => {
-              setEtapa('');
               setTemp('');
               setObjetivo('');
               setOrigem('');
@@ -235,6 +273,12 @@ export default function LeadsListPage() {
               titulo="Nenhum lead ainda"
               descricao="Cadastre o primeiro lead com só nome e telefone."
               acao={<Button variante="primario" icone={<Plus className="h-4 w-4" />} onClick={() => abrirNovoLead()}>Novo lead</Button>}
+            />
+          ) : etapaAtual && !filtro && !busca && (resumo[etapa]?.qtd ?? 0) === 0 ? (
+            <EmptyState
+              icone={<Users className="h-6 w-6" />}
+              titulo={`Nenhum lead em “${etapaAtual.nome}”`}
+              descricao="Mude a etapa de um lead pelo seletor no card dele, ou cadastre um novo lead."
             />
           ) : filtro === 'nao_contatados_hoje' ? (
             <EmptyState icone={<CheckSquare className="h-6 w-6" />} titulo="Todos os leads foram contatados hoje" descricao="Ótimo trabalho. Que tal pedir indicações aos clientes?" />
@@ -260,7 +304,7 @@ export default function LeadsListPage() {
       )}
 
       <p className="mt-6 hidden text-center text-xs text-slate-400 md:block">
-        Teclado: <kbd className="font-sans font-semibold">J</kbd>/<kbd className="font-sans font-semibold">K</kbd> navegar · <kbd className="font-sans font-semibold">L</kbd> ligação ·{' '}
+        Teclado: <kbd className="font-sans font-semibold">[</kbd>/<kbd className="font-sans font-semibold">]</kbd> trocar etapa · <kbd className="font-sans font-semibold">J</kbd>/<kbd className="font-sans font-semibold">K</kbd> navegar · <kbd className="font-sans font-semibold">L</kbd> ligação ·{' '}
         <kbd className="font-sans font-semibold">W</kbd> WhatsApp · <kbd className="font-sans font-semibold">X</kbd> selecionar
       </p>
 

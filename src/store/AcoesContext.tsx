@@ -11,6 +11,7 @@ import { NewLeadModal } from '../components/leads/NewLeadModal';
 import { LostReasonModal } from '../components/leads/LostReasonModal';
 import { WonModal } from '../components/leads/WonModal';
 import { ConfirmDialog, type ConfirmOpts } from '../components/ui/ConfirmDialog';
+import { ScheduleModal, type AgendamentoPrefill } from '../components/agenda/ScheduleModal';
 
 interface Acoes {
   /** 1 clique: registra o contato (e abre o WhatsApp se for o caso) + mini-popup opcional. */
@@ -19,6 +20,8 @@ interface Acoes {
   /** Move de etapa tratando "Perdido" (pede motivo) e "Ganho" (converte em cliente). */
   pedirMoverEtapa(lead: Lead, etapaId: string): void;
   confirmar(opts: ConfirmOpts): Promise<boolean>;
+  /** Card de agendamento rápido (reunião, retorno ou tarefa). */
+  abrirAgendamento(prefill?: AgendamentoPrefill): void;
   buscaAberta: boolean;
   setBuscaAberta(v: boolean): void;
   atalhosAbertos: boolean;
@@ -37,6 +40,7 @@ export function AcoesProvider({ children }: { children: ReactNode }) {
   const [confirm, setConfirm] = useState<(ConfirmOpts & { resolve: (b: boolean) => void }) | null>(null);
   const [buscaAberta, setBuscaAberta] = useState(false);
   const [atalhosAbertos, setAtalhosAbertos] = useState(false);
+  const [agendamento, setAgendamento] = useState<AgendamentoPrefill | null>(null);
 
   const dataRef = useRef(data);
   dataRef.current = data;
@@ -112,6 +116,7 @@ export function AcoesProvider({ children }: { children: ReactNode }) {
       abrirNovoLead: (prefill) => setNovoLead({ prefill }),
       pedirMoverEtapa,
       confirmar,
+      abrirAgendamento: (prefill) => setAgendamento({ ...prefill }),
       buscaAberta,
       setBuscaAberta,
       atalhosAbertos,
@@ -127,6 +132,7 @@ export function AcoesProvider({ children }: { children: ReactNode }) {
       <NewLeadModal aberto={!!novoLead} prefill={novoLead?.prefill} onFechar={() => setNovoLead(null)} />
       <LostReasonModal lead={perda} onFechar={() => setPerda(null)} />
       <WonModal lead={ganho} onFechar={() => setGanho(null)} />
+      <ScheduleModal prefill={agendamento} onFechar={() => setAgendamento(null)} />
       <ConfirmDialog
         opts={confirm}
         onResolver={(ok) => {

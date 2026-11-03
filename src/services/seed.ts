@@ -242,11 +242,11 @@ export async function popularDadosExemplo(): Promise<void> {
   const tarefas: Tarefa[] = [
     tarefa({ leadId: L['Juliana Castro'], titulo: 'Retorno sobre a simulação', tipo: 'retorno', dataHora: diasAFrente(0, 10), diaInteiro: false }),
     tarefa({ leadId: L['Camila Duarte'], titulo: 'Retornar contato', tipo: 'retorno', dataHora: diasAFrente(0, 14), diaInteiro: false }),
-    tarefa({ leadId: L['Larissa Martins'], titulo: 'Reunião por vídeo com o casal', tipo: 'reuniao', dataHora: diasAFrente(0, 16, 30), diaInteiro: false }),
+    tarefa({ leadId: L['Larissa Martins'], titulo: 'Apresentar proposta ao casal', tipo: 'reuniao', formato: 'video', local: 'https://meet.google.com/abc-defg-hij', dataHora: diasAFrente(0, 16, 30), diaInteiro: false }),
     tarefa({ leadId: L['Aline Teixeira'], titulo: 'Retornar contato', tipo: 'retorno', dataHora: diasAFrente(0, 9), diaInteiro: true }),
     tarefa({ leadId: L['Thiago Nascimento'], titulo: 'Retornar contato', tipo: 'retorno', dataHora: diasAFrente(-2, 9), diaInteiro: true }),
     tarefa({ leadId: L['Rodrigo Barbosa'], titulo: 'Cobrar retorno da simulação', tipo: 'retorno', dataHora: diasAFrente(-1, 11), diaInteiro: false }),
-    tarefa({ leadId: L['Ana Beatriz Rocha'], titulo: 'Reunião presencial', tipo: 'reuniao', dataHora: diasAFrente(1, 15), diaInteiro: false }),
+    tarefa({ leadId: L['Ana Beatriz Rocha'], titulo: 'Simulação detalhada', tipo: 'reuniao', formato: 'presencial', local: 'Escritório — Av. Paulista, 1000', dataHora: diasAFrente(1, 15), diaInteiro: false }),
     tarefa({ leadId: L['Marcelo Azevedo'], titulo: 'Enviar proposta final', tipo: 'tarefa', dataHora: diasAFrente(3, 9), diaInteiro: true }),
     tarefa({ leadId: L['Bruno Carvalho'], titulo: 'Retornar contato', tipo: 'retorno', dataHora: diasAFrente(5, 9), diaInteiro: true }),
     tarefa({ leadId: L['Mariana Albuquerque'], titulo: 'Enviar contrato para assinatura', tipo: 'tarefa', dataHora: diasAFrente(-1, 9), diaInteiro: true, concluida: true, concluidaEm: diasAtras(1) }),

@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { Keyboard, Plus } from 'lucide-react';
-import { NAV } from './nav';
+import { NAV, NAV_CONFIG } from './nav';
 import { Logo } from './Logo';
 import { useAcoes } from '../../store/AcoesContext';
 import { useDerivados } from '../../hooks/useDerivados';
@@ -49,6 +49,17 @@ export function Sidebar() {
           </NavLink>
         ))}
       </nav>
+      <NavLink
+        to={NAV_CONFIG.to}
+        className={({ isActive }) =>
+          cn(
+            'mb-1 flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium',
+            isActive ? 'bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300' : 'text-slate-400 hover:bg-slate-50 hover:text-slate-700 dark:hover:bg-slate-800',
+          )
+        }
+      >
+        <NAV_CONFIG.icone className="h-4 w-4" /> {NAV_CONFIG.label}
+      </NavLink>
       <button
         onClick={() => setAtalhosAbertos(true)}
         className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-slate-400 hover:bg-slate-50 hover:text-slate-700 dark:hover:bg-slate-800"

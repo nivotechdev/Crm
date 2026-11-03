@@ -94,6 +94,9 @@ export type Contato = Atividade & { tipo: Canal };
 
 export type TipoTarefa = 'retorno' | 'reuniao' | 'tarefa' | 'assembleia' | 'indicacao';
 
+/** Como a reunião acontece. */
+export type FormatoReuniao = 'presencial' | 'video' | 'telefone';
+
 /** Tabela `tarefas` — retornos e compromissos. */
 export interface Tarefa {
   id: ID;
@@ -102,6 +105,10 @@ export interface Tarefa {
   dataHora: ISODate;
   /** true quando o horário não importa (vence no dia) */
   diaInteiro: boolean;
+  /** Só para reuniões */
+  formato?: FormatoReuniao;
+  /** Endereço (presencial) ou link (vídeo) */
+  local?: string;
   leadId?: ID;
   clienteId?: ID;
   concluida: boolean;

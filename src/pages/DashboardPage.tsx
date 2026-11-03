@@ -1,6 +1,6 @@
-import { useMemo, type ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ArrowUpRight, Phone } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, CalendarPlus, Pencil, Phone, Settings } from 'lucide-react';
 import { useData } from '../store/DataContext';
 import { useNow } from '../store/NowContext';
 import { useDerivados } from '../hooks/useDerivados';
@@ -16,11 +16,16 @@ import { WhatsAppIcon } from '../components/ui/WhatsAppIcon';
 import { TaskItem } from '../components/agenda/TaskItem';
 import { ContactStripe, LastContactBadge } from '../components/leads/LastContactBadge';
 import { QuickContactButtons } from '../components/leads/QuickContactButtons';
+import { MetaModal } from '../components/dashboard/MetaModal';
+import { Button } from '../components/ui/Button';
+import { useAcoes } from '../store/AcoesContext';
 
 export default function DashboardPage() {
   const { leads, atividades, clientes, config } = useData();
   const now = useNow();
   const d = useDerivados();
+  const { abrirAgendamento } = useAcoes();
+  const [editarMeta, setEditarMeta] = useState(false);
 
   const vermelhoApartir = config.laranjaAteDias + 1;
   const atrasados = useMemo(
@@ -49,12 +54,28 @@ export default function DashboardPage() {
 
   return (
     <div className="mx-auto max-w-[1400px] px-4 py-5 md:px-8 md:py-8">
-      <header className="mb-6 md:mb-8">
-        <p className="text-[13px] font-medium text-slate-400">{formatDiaSemana(now.toISOString())}</p>
-        <h1 className="mt-1 text-[26px] font-bold leading-tight tracking-[-0.02em] text-slate-900 dark:text-white md:text-[30px]">
-          {saudacao(now)}
-          {config.nomeVendedor.trim() ? `, ${primeiroNome(config.nomeVendedor)}` : ''}
-        </h1>
+      <header className="mb-6 flex items-start justify-between gap-3 md:mb-8">
+        <div className="min-w-0">
+          <p className="text-[13px] font-medium text-slate-400">{formatDiaSemana(now.toISOString())}</p>
+          <h1 className="mt-1 truncate text-[26px] font-bold leading-tight tracking-[-0.02em] text-slate-900 dark:text-white md:text-[30px]">
+            {saudacao(now)}
+            {config.nomeVendedor.trim() ? `, ${primeiroNome(config.nomeVendedor)}` : ''}
+          </h1>
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          <Button variante="primario" icone={<CalendarPlus className="h-4 w-4" />} onClick={() => abrirAgendamento({ tipo: 'reuniao' })} className="hidden sm:inline-flex">
+            Agendar
+          </Button>
+          <Link
+            to="/configuracoes"
+            aria-label="Configurações"
+            title="Configurações (G S)"
+            className="flex h-10 items-center gap-2 rounded-full border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 sm:px-4"
+          >
+            <Settings className="h-[18px] w-[18px]" />
+            <span className="hidden sm:inline">Configurações</span>
+          </Link>
+        </div>
       </header>
 
       {/* Meta do dia + indicadores */}
@@ -62,15 +83,26 @@ export default function DashboardPage() {
         <Card className="p-5 md:p-6">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400">Contatos hoje</p>
-              <p className="num mt-1 text-4xl font-bold tracking-tight text-slate-900 dark:text-white">
+              <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400">Contatos hoje · meta {meta}</p>
+              <button type="button" onClick={() => setEditarMeta(true)} className="num mt-1 text-left text-4xl font-bold tracking-tight text-slate-900 dark:text-white" title="Editar meta diária">
                 {d.contatosHojeTotal}
                 <span className="text-xl font-semibold text-slate-300 dark:text-slate-600"> / {meta}</span>
-              </p>
+              </button>
             </div>
-            <span className={cn('rounded-full px-2.5 py-1 text-xs font-semibold', pctMeta >= 1 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300' : 'bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300')}>
-              {pctMeta >= 1 ? 'Meta batida' : `Faltam ${faltam}`}
-            </span>
+            <div className="flex items-center gap-1.5">
+              <span className={cn('rounded-full px-2.5 py-1 text-xs font-semibold', pctMeta >= 1 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300' : 'bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300')}>
+                {pctMeta >= 1 ? 'Meta batida' : `Faltam ${faltam}`}
+              </span>
+              <button
+                type="button"
+                onClick={() => setEditarMeta(true)}
+                aria-label="Editar meta diária"
+                title="Editar meta diária"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-white"
+              >
+                <Pencil className="h-4 w-4" />
+              </button>
+            </div>
           </div>
           <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
             <div className={cn('h-full rounded-full transition-all duration-500', pctMeta >= 1 ? 'bg-emerald-500' : 'bg-brand-500')} style={{ width: `${pctMeta * 100}%` }} />
@@ -96,7 +128,22 @@ export default function DashboardPage() {
 
       <div className="grid gap-4 md:gap-5 lg:grid-cols-[1.6fr_1fr]">
         <Card>
-          <CardHeader titulo="Para hoje" subtitulo="Retornos, reuniões e tarefas" acao={<VerTudo to="/agenda" />} />
+          <CardHeader
+            titulo="Para hoje"
+            subtitulo="Retornos, reuniões e tarefas"
+            acao={
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => abrirAgendamento({ tipo: 'reuniao' })}
+                  className="flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-semibold text-brand-700 transition-colors hover:bg-brand-50 dark:text-brand-300 dark:hover:bg-brand-500/10"
+                >
+                  <CalendarPlus className="h-4 w-4" /> Agendar
+                </button>
+                <VerTudo to="/agenda" />
+              </div>
+            }
+          />
           {agenda.length === 0 ? (
             <EmptyState titulo="Nada agendado para hoje" descricao="Aproveite para atacar os leads atrasados." />
           ) : (
@@ -109,7 +156,7 @@ export default function DashboardPage() {
         </Card>
 
         <Card>
-          <CardHeader titulo="Funil" subtitulo={`${d.leadsAtivos.length} leads ativos · ${totalConv}% viram venda`} acao={<VerTudo to="/funil" />} />
+          <CardHeader titulo="Funil" subtitulo={`${d.leadsAtivos.length} leads ativos · ${totalConv}% viram venda`} acao={<VerTudo to="/leads" />} />
           <ul className="space-y-3.5 px-5 pb-5">
             {abertas.map((e) => {
               const qtd = d.leadsAtivos.filter((l) => l.etapaId === e.id).length;
@@ -183,6 +230,7 @@ export default function DashboardPage() {
           </div>
         </Card>
       </div>
+      <MetaModal aberto={editarMeta} onFechar={() => setEditarMeta(false)} />
     </div>
   );
 }

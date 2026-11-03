@@ -1,5 +1,5 @@
 import type {
-  Canal, MotivoPerda, Objetivo, ResultadoContato, SimNaoTalvez, StatusCliente, Temperatura, TipoBem, TipoTarefa, Urgencia,
+  Canal, FormatoReuniao, MotivoPerda, Objetivo, ResultadoContato, SimNaoTalvez, StatusCliente, Temperatura, TipoBem, TipoTarefa, Urgencia,
 } from '../types';
 
 export const OBJETIVOS: Record<Objetivo, string> = {
@@ -62,6 +62,12 @@ export const TIPOS_TAREFA: Record<TipoTarefa, string> = {
   tarefa: 'Tarefa',
   assembleia: 'Assembleia',
   indicacao: 'Pedir indicação',
+};
+
+export const FORMATOS_REUNIAO: Record<FormatoReuniao, string> = {
+  presencial: 'Presencial',
+  video: 'Videochamada',
+  telefone: 'Telefone',
 };
 
 export function opcoes<T extends string>(rec: Record<T, string>): Array<{ value: T; label: string }> {

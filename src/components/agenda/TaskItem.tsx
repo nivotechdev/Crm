@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom';
-import { Check, Trash2 } from 'lucide-react';
+import { Check, Link2, MapPin, Phone, Trash2, Video } from 'lucide-react';
 import type { Lead, Tarefa } from '../../types';
 import { useData } from '../../store/DataContext';
 import { useToast } from '../../store/ToastContext';
 import { useNow } from '../../store/NowContext';
 import { diffDiasCalendario, formatData, formatHora, tempoRelativoAgenda } from '../../lib/dates';
-import { TIPOS_TAREFA } from '../../lib/labels';
+import { FORMATOS_REUNIAO, TIPOS_TAREFA } from '../../lib/labels';
 import { cn } from '../../lib/cn';
 import { LastContactBadge, ContactStripe } from '../leads/LastContactBadge';
 import { QuickContactButtons } from '../leads/QuickContactButtons';
@@ -51,7 +51,15 @@ export function TaskItem({ tarefa, lead, onExcluir, mostrarData = true }: { tare
         </p>
         <p className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-500 dark:text-slate-400">
           {lead && <span className="truncate">{tarefa.titulo}</span>}
-          <span className="text-slate-400">· {TIPOS_TAREFA[tarefa.tipo]}</span>
+          <span className="inline-flex items-center gap-1 text-slate-400">
+            · {TIPOS_TAREFA[tarefa.tipo]}
+            {tarefa.formato && (
+              <>
+                {tarefa.formato === 'video' ? <Video className="h-3 w-3" /> : tarefa.formato === 'presencial' ? <MapPin className="h-3 w-3" /> : <Phone className="h-3 w-3" />}
+                {FORMATOS_REUNIAO[tarefa.formato].toLowerCase()}
+              </>
+            )}
+          </span>
           <span className={cn(atrasada && 'font-semibold text-red-600 dark:text-red-400')}>
             {mostrarData && `${tempoRelativoAgenda(tarefa.dataHora, now)}`}
             {mostrarData && dias !== 0 && ` (${formatData(tarefa.dataHora, { ano: false })})`}
@@ -59,6 +67,19 @@ export function TaskItem({ tarefa, lead, onExcluir, mostrarData = true }: { tare
           </span>
           {lead && <LastContactBadge ultimoContatoEm={lead.ultimoContatoEm} canal={lead.ultimoContatoCanal} compacto className="sm:hidden" />}
         </p>
+        {tarefa.local && !tarefa.concluida && (
+          <p className="mt-0.5 truncate text-xs">
+            {/^https?:\/\//.test(tarefa.local) ? (
+              <a href={tarefa.local} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 font-medium text-brand-700 hover:underline dark:text-brand-300">
+                <Link2 className="h-3 w-3" /> Entrar na chamada
+              </a>
+            ) : (
+              <span className="inline-flex items-center gap-1 text-slate-500">
+                <MapPin className="h-3 w-3" /> {tarefa.local}
+              </span>
+            )}
+          </p>
+        )}
       </div>
       {lead && <LastContactBadge ultimoContatoEm={lead.ultimoContatoEm} canal={lead.ultimoContatoCanal} compacto className="hidden sm:inline-flex" />}
       {lead && !tarefa.concluida && <QuickContactButtons lead={lead} tamanho="sm" soIcone />}

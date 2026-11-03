@@ -17,6 +17,7 @@ create type motivo_perda     as enum ('sem_dinheiro','preferiu_financiamento','o
 create type tipo_etapa       as enum ('aberta','ganho','perdido');
 create type tipo_atividade   as enum ('ligacao','whatsapp','nota','etapa','simulacao','sistema');
 create type tipo_tarefa      as enum ('retorno','reuniao','tarefa','assembleia','indicacao');
+create type formato_reuniao  as enum ('presencial','video','telefone');
 create type status_cliente   as enum ('ativo','contemplado','cancelado');
 create type tipo_bem         as enum ('imovel','veiculo','pesado','servicos','outro');
 
@@ -119,6 +120,8 @@ create table tarefas (
   tipo          tipo_tarefa not null default 'retorno',
   data_hora     timestamptz not null,
   dia_inteiro   boolean not null default true,
+  formato       formato_reuniao,
+  local         text,
   lead_id       uuid references leads on delete cascade,
   cliente_id    uuid,
   concluida     boolean not null default false,

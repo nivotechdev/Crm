@@ -1,18 +1,14 @@
 import { useMemo, useState } from 'react';
 import { CalendarCheck, CalendarX, Plus } from 'lucide-react';
-import type { TipoTarefa } from '../types';
 import { useData } from '../store/DataContext';
 import { useAcoes } from '../store/AcoesContext';
 import { useToast } from '../store/ToastContext';
 import { useNow } from '../store/NowContext';
 import { useDerivados } from '../hooks/useDerivados';
 import { addDays, endOfDay, formatDiaSemana, startOfDay, toInputDate } from '../lib/dates';
-import { TIPOS_TAREFA, opcoes } from '../lib/labels';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { EmptyState } from '../components/ui/EmptyState';
-import { Field, Input, Select } from '../components/ui/Field';
-import { Modal } from '../components/ui/Modal';
 import { Segmented } from '../components/ui/Segmented';
 import { PageHeader } from '../components/layout/PageHeader';
 import { TaskItem } from '../components/agenda/TaskItem';
@@ -21,12 +17,11 @@ type Aba = 'hoje' | 'atrasados' | 'semana' | 'concluidas';
 
 export default function AgendaPage() {
   const { tarefas, excluirTarefa } = useData();
-  const { confirmar } = useAcoes();
+  const { confirmar, abrirAgendamento } = useAcoes();
   const toast = useToast();
   const now = useNow();
   const d = useDerivados();
   const [aba, setAba] = useState<Aba>(() => (d.tarefasAtrasadas.length > 0 && d.tarefasHoje.length === 0 ? 'atrasados' : 'hoje'));
-  const [nova, setNova] = useState(false);
 
   const fimSemana = endOfDay(addDays(now, 6)).toISOString();
   const inicioHoje = startOfDay(now).toISOString();
@@ -62,7 +57,7 @@ export default function AgendaPage() {
         titulo="Agenda"
         subtitulo="Retornos, reuniões e tarefas"
         acoes={
-          <Button variante="primario" icone={<Plus className="h-4 w-4" />} onClick={() => setNova(true)}>
+          <Button variante="primario" icone={<Plus className="h-4 w-4" />} onClick={() => abrirAgendamento({ tipo: 'reuniao' })}>
             Nova tarefa
           </Button>
         }
@@ -86,8 +81,8 @@ export default function AgendaPage() {
             <EmptyState
               icone={<CalendarX className="h-6 w-6" />}
               titulo={aba === 'concluidas' ? 'Nenhuma tarefa concluída ainda' : 'Nada agendado'}
-              descricao="Agende retornos direto do popup após cada ligação ou WhatsApp."
-              acao={aba !== 'concluidas' && <Button onClick={() => setNova(true)}>Nova tarefa</Button>}
+              descricao="Agende reuniões pelo botão de calendário no card do lead, ou retornos pelo popup após cada contato."
+              acao={aba !== 'concluidas' && <Button onClick={() => abrirAgendamento({ tipo: 'reuniao' })}>Agendar agora</Button>}
             />
           )
         ) : grupos ? (
@@ -111,73 +106,6 @@ export default function AgendaPage() {
           </ul>
         )}
       </Card>
-      <NovaTarefaModal aberto={nova} onFechar={() => setNova(false)} />
     </div>
-  );
-}
-
-function NovaTarefaModal({ aberto, onFechar }: { aberto: boolean; onFechar: () => void }) {
-  const { leads, criarTarefa } = useData();
-  const toast = useToast();
-  const [titulo, setTitulo] = useState('');
-  const [tipo, setTipo] = useState<TipoTarefa>('retorno');
-  const [leadNome, setLeadNome] = useState('');
-  const [data, setData] = useState(toInputDate(new Date().toISOString()));
-  const [hora, setHora] = useState('');
-
-  const salvar = async () => {
-    if (!data) return;
-    const lead = leads.find((l) => l.nome.toLowerCase() === leadNome.trim().toLowerCase());
-    await criarTarefa({
-      titulo: titulo.trim() || TIPOS_TAREFA[tipo],
-      tipo,
-      leadId: lead?.id,
-      dataHora: new Date(`${data}T${hora || '09:00'}:00`).toISOString(),
-      diaInteiro: !hora,
-    });
-    toast('Tarefa criada');
-    setTitulo('');
-    setLeadNome('');
-    setHora('');
-    onFechar();
-  };
-
-  return (
-    <Modal
-      aberto={aberto}
-      onFechar={onFechar}
-      titulo="Nova tarefa"
-      tamanho="sm"
-      rodape={
-        <>
-          <Button variante="fantasma" onClick={onFechar}>Cancelar</Button>
-          <Button variante="primario" onClick={salvar}>Salvar</Button>
-        </>
-      }
-    >
-      <form className="grid grid-cols-2 gap-3" onSubmit={(e) => (e.preventDefault(), salvar())}>
-        <Field label="Lead (opcional)" className="col-span-2">
-          <Input list="lista-leads" value={leadNome} onChange={(e) => setLeadNome(e.target.value)} placeholder="Digite o nome…" />
-          <datalist id="lista-leads">
-            {leads.map((l) => (
-              <option key={l.id} value={l.nome} />
-            ))}
-          </datalist>
-        </Field>
-        <Field label="Descrição" className="col-span-2">
-          <Input value={titulo} onChange={(e) => setTitulo(e.target.value)} placeholder="Ex.: Retornar sobre a proposta" />
-        </Field>
-        <Field label="Tipo" className="col-span-2">
-          <Select value={tipo} onChange={(e) => setTipo(e.target.value as TipoTarefa)} opcoes={opcoes(TIPOS_TAREFA)} />
-        </Field>
-        <Field label="Data">
-          <Input type="date" value={data} onChange={(e) => setData(e.target.value)} />
-        </Field>
-        <Field label="Hora (opcional)">
-          <Input type="time" value={hora} onChange={(e) => setHora(e.target.value)} />
-        </Field>
-        <button type="submit" className="hidden" />
-      </form>
-    </Modal>
   );
 }

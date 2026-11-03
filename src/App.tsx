@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { HashRouter, MemoryRouter, Route, Routes } from 'react-router-dom';
+import { HashRouter, MemoryRouter, Navigate, Route, Routes } from 'react-router-dom';
 
 /** No modo "artifact" (página única embutida) a navegação fica em memória. */
 const Router = import.meta.env.VITE_ROUTER === 'memory' ? MemoryRouter : HashRouter;
@@ -12,7 +12,6 @@ import { AppShell } from './components/layout/AppShell';
 import DashboardPage from './pages/DashboardPage';
 import LeadsListPage from './pages/LeadsListPage';
 
-const LeadsKanbanPage = lazy(() => import('./pages/LeadsKanbanPage'));
 const LeadDetailPage = lazy(() => import('./pages/LeadDetailPage'));
 const AgendaPage = lazy(() => import('./pages/AgendaPage'));
 const ClientsPage = lazy(() => import('./pages/ClientsPage'));
@@ -38,7 +37,7 @@ function Rotas() {
           <Route index element={<DashboardPage />} />
           <Route path="leads" element={<LeadsListPage />} />
           <Route path="leads/:id" element={<LeadDetailPage />} />
-          <Route path="funil" element={<LeadsKanbanPage />} />
+          <Route path="funil" element={<Navigate to="/leads" replace />} />
           <Route path="agenda" element={<AgendaPage />} />
           <Route path="clientes" element={<ClientsPage />} />
           <Route path="relatorios" element={<ReportsPage />} />

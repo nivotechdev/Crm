@@ -7,6 +7,7 @@ const GRUPOS = [
     itens: [
       ['Ctrl K  ou  /', 'Busca global'],
       ['N', 'Novo lead'],
+      ['M', 'Agendar reunião'],
       ['?', 'Mostrar atalhos'],
       ['Esc', 'Fechar janela / popup'],
     ],
@@ -14,9 +15,8 @@ const GRUPOS = [
   {
     titulo: 'Navegação',
     itens: [
-      ['G  D', 'Painel'],
-      ['G  L', 'Leads (lista)'],
-      ['G  F', 'Funil (kanban)'],
+      ['G  D', 'Início'],
+      ['G  L', 'Leads'],
       ['G  A', 'Agenda'],
       ['G  C', 'Clientes'],
       ['G  R', 'Relatórios'],
@@ -24,9 +24,10 @@ const GRUPOS = [
     ],
   },
   {
-    titulo: 'Na lista de leads',
+    titulo: 'Em Leads',
     itens: [
-      ['J / K  ou  ↓ / ↑', 'Próximo / anterior'],
+      ['[  /  ]', 'Etapa anterior / próxima'],
+      ['J / K  ou  setas', 'Navegar entre os cards'],
       ['L', 'Registrar ligação no lead selecionado'],
       ['W', 'WhatsApp no lead selecionado'],
       ['Enter', 'Abrir ficha'],
